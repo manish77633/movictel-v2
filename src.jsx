@@ -146,8 +146,10 @@ function Strategy() {
       <ol className="strategy-steps">
         {strategySteps.map(({ lead, title, icon: Icon, text }) => <li key={title}>
           <StrategyIcon kind={title} fallback={Icon} reducedMotion={reduce}/>
-          <h3><span>{lead}</span> {title}</h3>
-          <p>{text}</p>
+          <div className="strategy-step-copy">
+            <h3><span>{lead}</span> {title}</h3>
+            <p>{text}</p>
+          </div>
         </li>)}
       </ol>
     </div>
@@ -175,9 +177,21 @@ const serviceGraphics = {
   landing: <div className="landing-study"><div><b>Find your<br/>next home.</b><span>Book a visit</span></div><div className="landing-window"><ArrowUpRight size={25}/></div></div>,
 }
 
+const servicePhotos = {
+  brand: 'design.jpg',
+  whatsapp: 'wa.jpg',
+  sms: 'sms.jpg',
+  rcs: 'social.jpg',
+  voice: 'sms.jpg',
+  website: 'web.jpg',
+  graphic: 'design.jpg',
+  landing: 'estate.jpg',
+}
+
 function ServiceArtwork({ photo, visual }) {
+  const image = photo || servicePhotos[visual]
   return <div className={visual ? 'service-art service-art--' + visual : 'service-art'} aria-hidden="true">
-    {photo && <img src={media(photo)} alt="" loading="lazy"/>}
+    {image && <img src={media(image)} alt="" loading="lazy"/>}
     {visual === 'social' && <div className="social-frame"><span>Open house</span><small>Sunday · 11 am</small></div>}
     {serviceGraphics[visual]}
   </div>
@@ -296,25 +310,62 @@ function Industries() {
 
 
 function Clients() {
+  const [paused, setPaused] = useState(false)
+  const reduce = useReducedMotion()
+
   return <section className="section clients" aria-labelledby="clients-heading">
     <div className="wrap">
-      <div className="client-heading"><RevealHeading id="clients-heading">Businesses we work with</RevealHeading></div>
-      <ul className="client-logos" aria-label="Client logos" tabIndex={0}>{clients.map(([name, image]) =>
-        <li key={name}><img src={media(image)} alt={name} loading="lazy"/></li>)}</ul>
+      <div className="client-heading client-strip-heading">
+        <RevealHeading id="clients-heading">Businesses we work with</RevealHeading>
+        {!reduce && <button className="carousel-button" type="button" onClick={() => setPaused(!paused)}
+          aria-label={paused ? 'Play logo animation' : 'Pause logo animation'}>
+          {paused ? <Play size={16}/> : <Pause size={16}/>}
+        </button>}
+      </div>
+      <div className="client-strip" data-paused={paused}>
+        <div className="client-track">
+          {[false, true].map(copy => <ul className="client-logo-set" key={String(copy)} aria-hidden={copy || undefined}>
+            {clients.map(([name, image]) => <li key={name}><img src={media(image)} alt={name} loading="lazy"/></li>)}
+          </ul>)}
+        </div>
+      </div>
     </div>
   </section>
 }
 
+const testimonialOrder = [testimonials[1], testimonials[0], testimonials[2]]
+
 function Testimonials() {
-  const order = [testimonials[1], testimonials[0], testimonials[2]]
+  const [active, setActive] = useState(0)
+  const reduce = useReducedMotion()
+  const count = testimonialOrder.length
+  const [copy, name, role] = testimonialOrder[active]
+
+  function change(direction) {
+    setActive(index => (index + direction + count) % count)
+  }
+
   return <section className="section testimonials" aria-labelledby="testimonials-heading">
-    <div className="wrap">
-      <div className="section-heading"><RevealHeading id="testimonials-heading">What our clients say</RevealHeading><p>On working with Movictel across messaging and web development.</p></div>
-      <div className="quote-bento">{order.map(([copy, name, role], i) => <figure key={name} className={i === 0 ? 'quote-feature' : undefined}>
-        <Quote className="quote-icon" size={i === 0 ? 30 : 20} aria-hidden="true"/>
-        <blockquote>“{copy}”</blockquote>
-        <figcaption><strong>{name}</strong><span>{role}</span></figcaption>
-      </figure>)}</div>
+    <div className="wrap testimonial-layout">
+      <div className="testimonial-heading">
+        <RevealHeading id="testimonials-heading">What our clients say</RevealHeading>
+        <div className="testimonial-controls">
+          <button className="carousel-button" type="button" aria-label="Previous testimonial" onClick={() => change(-1)}><ArrowDown size={18} className="quote-prev"/></button>
+          <span>{active + 1} / {count}</span>
+          <button className="carousel-button" type="button" aria-label="Next testimonial" onClick={() => change(1)}><ArrowDown size={18} className="quote-next"/></button>
+        </div>
+      </div>
+      <div className="testimonial-stage" aria-live="polite">
+        <Quote className="testimonial-mark" size={38} aria-hidden="true"/>
+        <AnimatePresence initial={false} mode="wait">
+          <motion.figure key={name} initial={reduce ? false : { opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }} exit={reduce ? undefined : { opacity: 0, y: -10 }}
+            transition={{ duration: reduce ? 0 : .24 }}>
+            <blockquote>“{copy}”</blockquote>
+            <figcaption><strong>{name}</strong><span>{role}</span></figcaption>
+          </motion.figure>
+        </AnimatePresence>
+      </div>
     </div>
   </section>
 }

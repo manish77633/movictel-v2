@@ -1,6 +1,5 @@
 /* Campaign photography, service links and contact sections. */
 .hero-image { object-position: 66% 57%; }
-.hero::after { background: linear-gradient(90deg,#0d1830 4%,#0d1830ec 27%,#0d1830b5 53%,#0d183024 100%),linear-gradient(0deg,#0d1830f6,transparent 64%); }
 .category-icon { border: 1px solid #d5dfff; }
 .category-icon svg { stroke-width: 1.65; }
 .service-card-link:focus-visible { outline-offset: -3px; }
@@ -9,9 +8,6 @@
 .service-card-action svg { transition: transform .22s; }
 .service-card-link:hover .service-card-action svg, .service-card-link:focus-visible .service-card-action svg { transform: translate(2px,-2px); }
 
-.client-logos { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 9px; list-style: none; padding: 0; }
-.client-logos li { min-width: 0; }
-.client-logos img { background: #f5f7fc; border: 1px solid var(--hairline); height: clamp(77px,7.5vw,130px); object-fit: contain; padding: 7px; border-radius: 8px; }
 .quote-bento figcaption strong { font-size: .94rem; }
 .quote-bento .quote-feature figcaption strong { font-size: 1.05rem; color: #e1e9ff; }
 
@@ -42,13 +38,10 @@
 .footer-wordmark:hover { color: #254b7d; -webkit-text-stroke-color: #83b5ff; text-shadow: 0 0 .13em #5a9cf855; }
 @media(max-width:900px) {
   .footer-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
-  .client-logos { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(138px,27%); overflow-x: auto; scroll-snap-type: inline mandatory; padding-bottom: 8px; }
-  .client-logos li { scroll-snap-align: start; }
 }
 @media(max-width:760px) {
   .hero-layout { padding-top: clamp(90px,24vw,170px); }
   .hero-image { height: 83%; object-position: 62% 45%; }
-  .hero::after { background: linear-gradient(0deg,#0d1830 24%,#0d1830ce 56%,#0d183025 100%); }
   .closing-layout { grid-template-columns: 1fr; gap: 22px; }
   .closing p { margin-top: 16px; }
   .faq-photo { min-height: 150px; aspect-ratio: 2.25; }
@@ -56,5 +49,4 @@
   .footer-contact { order: 1; }
   .footer-nav, .footer-services { order: 2; }
 }
-@media (prefers-reduced-motion: reduce) { .client-logos { scroll-behavior: auto; } }
 
