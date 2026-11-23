@@ -3,7 +3,6 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [tailwindcss()],
-  // Tailwind runs as a Vite plugin. Skip PostCSS config discovery in parent directories.
+  cacheDir: '.vite-cache',
   css: { postcss: { plugins: [] } },
 })
-
