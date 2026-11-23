@@ -3,16 +3,12 @@
 .hero::after { background: linear-gradient(90deg,#0d1830 4%,#0d1830ec 27%,#0d1830b5 53%,#0d183024 100%),linear-gradient(0deg,#0d1830f6,transparent 64%); }
 .category-icon { border: 1px solid #d5dfff; }
 .category-icon svg { stroke-width: 1.65; }
-.service-card-link { display: flex; flex-direction: column; height: 100%; }
 .service-card-link:focus-visible { outline-offset: -3px; }
 .service-card-copy { display: flex; flex: 1; flex-direction: column; }
 .service-card-action { display: flex; align-items: center; gap: 5px; padding-top: 11px; margin-top: auto; font-size: .76rem; font-weight: 600; color: var(--accent); }
 .service-card-action svg { transition: transform .22s; }
 .service-card-link:hover .service-card-action svg, .service-card-link:focus-visible .service-card-action svg { transform: translate(2px,-2px); }
 
-.campaign-image { aspect-ratio: 1.82; background: #c6d6eb; }
-.campaign-image .campaign-cover { position: absolute; max-width: none; width: 240%; height: auto; aspect-ratio: auto; right: 0; top: 50%; transform: translateY(-48%); transform-origin: 85% 50%; }
-#education .campaign-cover { width: 250%; transform: translateY(-47%); }
 .client-logos { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 9px; list-style: none; padding: 0; }
 .client-logos li { min-width: 0; }
 .client-logos img { background: #f5f7fc; border: 1px solid var(--hairline); height: clamp(77px,7.5vw,130px); object-fit: contain; padding: 7px; border-radius: 8px; }

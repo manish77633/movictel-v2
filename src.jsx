@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { AnimatePresence, motion, MotionConfig, useReducedMotion } from 'framer-motion'
 import {
   ArrowDown, ArrowDownRight, ArrowUp, ArrowUpRight, CalendarDays, Check, ChevronDown, CodeXml,
-  MapPin, Menu, MessageCircle, MessageSquareText, Minus, Phone, Plus, Quote, TrendingUp, X,
+  Lightbulb, MapPin, Menu, Pause, Play, Search, MessageCircle, MessageSquareText, Minus, Phone, Plus, Quote, TrendingUp, X,
 } from 'lucide-react'
+import { StrategyIcon } from './strategy-icon.jsx'
+import { useSmoothWheel } from './smooth-wheel.js'
 import './style.css'
 import './contact.css'
 
@@ -87,8 +89,30 @@ function Header() {
 }
 
 function Hero() {
+  const reduceMotion = useReducedMotion()
+  const videoRef = useRef(null)
+  const [playing, setPlaying] = useState(false)
+
+  async function toggleVideo() {
+    const video = videoRef.current
+    if (video.paused) {
+      try { await video.play() } catch { setPlaying(false) }
+    } else {
+      video.pause()
+    }
+  }
+
   return <section className="hero" id="home" aria-labelledby="hero-title">
-    <img className="hero-image" src={media('estate.jpg')} alt="" fetchPriority="high"/>
+    <img className="hero-image" src={media('estate-hero.jpg')} alt="" fetchPriority="high"/>
+    {!reduceMotion && <>
+      <video ref={videoRef} className="hero-image hero-video" src={media('estate-hero.mp4')}
+        poster={media('estate-hero.jpg')} autoPlay loop muted playsInline aria-hidden="true"
+        onPlaying={() => setPlaying(true)} onPause={() => setPlaying(false)}/>
+      <button className="hero-video-toggle" type="button" onClick={toggleVideo}
+        aria-label={playing ? 'Pause background video' : 'Play background video'}>
+        {playing ? <Pause size={17}/> : <Play size={17}/>}
+      </button>
+    </>}
     <div className="wrap hero-layout">
       <div className="hero-copy">
         <p className="location"><MapPin size={16}/> Jaipur, Rajasthan</p>
@@ -106,6 +130,29 @@ function Hero() {
   </section>
 }
 
+
+const strategySteps = [
+  { lead: 'From', title: 'Insights', icon: Search, text: 'We study your audience, market and competitors to see what drives interest and where customers drop off.' },
+  { lead: 'To', title: 'Ideas', icon: Lightbulb, text: 'We turn what we learn into campaign concepts, clear messaging and pages that give people a reason to act.' },
+  { lead: 'To', title: 'Impact', icon: TrendingUp, text: 'We launch, track enquiries and refine the campaign based on what brings qualified leads.' },
+]
+
+function Strategy() {
+  const reduce = useReducedMotion()
+  return <section className="strategy" id="strategy" aria-labelledby="strategy-title">
+    <div className="strategy-growth" aria-hidden="true"/>
+    <div className="wrap strategy-inner">
+      <h2 id="strategy-title">Our strategy</h2>
+      <ol className="strategy-steps">
+        {strategySteps.map(({ lead, title, icon: Icon, text }) => <li key={title}>
+          <StrategyIcon kind={title} fallback={Icon} reducedMotion={reduce}/>
+          <h3><span>{lead}</span> {title}</h3>
+          <p>{text}</p>
+        </li>)}
+      </ol>
+    </div>
+  </section>
+}
 
 function RevealHeading({ children, id }) {
   const reduce = useReducedMotion()
@@ -136,17 +183,86 @@ function ServiceArtwork({ photo, visual }) {
   </div>
 }
 
+function ServiceIndex({ groupId, items }) {
+  const [active, setActive] = useState(0)
+  const reduce = useReducedMotion()
+
+  useEffect(() => {
+    const cards = [...document.getElementById(groupId).querySelectorAll('.service-card')]
+    let frame = 0
+    function update() {
+      frame = 0
+      const headerBottom = document.querySelector('.site-header').getBoundingClientRect().bottom
+      const next = cards.findLastIndex(card => card.getBoundingClientRect().top <= headerBottom + 120)
+      setActive(Math.max(0, next))
+    }
+    function schedule() {
+      if (!frame) frame = requestAnimationFrame(update)
+    }
+    update()
+    window.addEventListener('scroll', schedule, { passive: true })
+    window.addEventListener('resize', schedule)
+    return () => {
+      window.removeEventListener('scroll', schedule)
+      window.removeEventListener('resize', schedule)
+      cancelAnimationFrame(frame)
+    }
+  }, [groupId])
+
+  function jump(event, index) {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+    const card = document.getElementById(groupId + '-service-' + index)
+    const grid = card.parentElement
+    const gap = parseFloat(getComputedStyle(grid).rowGap) || 0
+    const earlierHeight = [...grid.children].slice(0, index)
+      .reduce((height, previous) => height + previous.offsetHeight + gap, 0)
+    const headerBottom = document.querySelector('.site-header').getBoundingClientRect().bottom
+    event.preventDefault()
+    card.focus({ preventScroll: true })
+    window.scrollTo({
+      top: window.scrollY + grid.getBoundingClientRect().top + earlierHeight - headerBottom - 74,
+      behavior: reduce ? 'instant' : 'smooth',
+    })
+  }
+
+  return <nav className="service-index" aria-label="Services in this category">
+    <ul>
+      {items.map(([name], index) => <li key={name}>
+        <a href={'#' + groupId + '-service-' + index} onClick={event => jump(event, index)}
+          aria-current={index === active ? 'location' : undefined}>
+          {name}<ArrowDownRight size={15} aria-hidden="true"/>
+        </a>
+      </li>)}
+    </ul>
+  </nav>
+}
+
 function Services() {
+  const reduce = useReducedMotion()
   return <section className="section service-section" id="services" aria-labelledby="services-heading">
     <div className="wrap">
       <div className="section-heading"><RevealHeading id="services-heading">Find the right service.</RevealHeading><p>Choose a specific service or bring marketing, messaging and development together.</p></div>
       {services.map(({ id, label, description, icon: Icon, items }) => <section key={id} id={id} className="service-group" aria-labelledby={id + '-heading'}>
-        <div className="service-group-heading"><span className="category-icon"><Icon size={20}/></span><h3 id={id + '-heading'}>{label}</h3><p>{description}</p></div>
-        <ul className="service-grid">{items.map(([name, detail, visual, photo]) => <li className="service-card" key={name}>
+        <div className="service-group-heading">
+          <div className="service-group-title">
+            <h3 id={id + '-heading'}>{label}</h3>
+            <span className="category-icon" aria-hidden="true"><Icon size={17}/></span>
+          </div>
+          <p>{description}</p>
+          <ServiceIndex groupId={id} items={items}/>
+        </div>
+        <ul className="service-grid">{items.map(([name, detail, visual, photo], index) => <li className="service-card" id={id + '-service-' + index} tabIndex={-1} key={name} style={{ "--stack-index": index }}>
 
           <a className="service-card-link" href={whatsapp + '?text=' + encodeURIComponent('Hi Movictel, I would like to know more about ' + name + '.')}>
+            <div className="service-card-copy">
+              <motion.div initial={reduce ? false : { y: 32, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }} viewport={{ once: true, amount: .25 }}
+                transition={{ duration: reduce ? 0 : .55, ease: [.22, 1, .36, 1] }}>
+                <h4>{name}</h4><p>{detail}</p>
+                <span className="service-card-action">Ask on WhatsApp <ArrowUpRight size={14}/></span>
+              </motion.div>
+            </div>
             <ServiceArtwork photo={photo} visual={visual}/>
-            <div className="service-card-copy"><h4>{name}</h4><p>{detail}</p><span className="service-card-action">Ask on WhatsApp <ArrowUpRight size={14}/></span></div>
           </a>
 
         </li>)}</ul>
@@ -158,12 +274,21 @@ function Services() {
 
 
 function Industries() {
-  return <section className="section industries" id="industries">
+  return <section className="section industries" id="industries" aria-labelledby="industries-heading">
     <div className="wrap">
-      <div className="section-heading"><RevealHeading>Built for your industry.</RevealHeading><p>Two examples of how Movictel brings marketing, content and technology together.</p></div>
-      <div className="industry-grid">{industries.map(({id,label,image,title,description}) => <article className="industry-card" key={id} id={id}>
-        <a href={media(image)} className="campaign-image" aria-label={'View ' + label.toLowerCase() + ' campaign artwork'}><img className="campaign-cover" src={media(image)} alt="" loading="lazy"/><span aria-hidden="true"><ArrowUpRight size={22}/></span></a>
-        <div className="industry-copy"><p className="category">{label}</p><h3>{title}</h3><p>{description}</p><a className="text-link" href={media(image)}>View campaign <ArrowUpRight size={17}/></a></div>
+      <div className="section-heading"><RevealHeading id="industries-heading">Built for your industry.</RevealHeading><p>See how we help property teams generate enquiries and schools attract new admissions.</p></div>
+      <div className="industry-grid">{industries.map(({id,label,image,alt,title,description}) => <article className="industry-card" key={id} id={id}>
+        <div className="campaign-image">
+          <img src={media(image)} alt={alt} width={700} height={466} loading="lazy"/>
+        </div>
+        <div className="industry-copy">
+          <p className="category">{label}</p>
+          <h3>{title}</h3>
+          <p>{description}</p>
+          <a className="text-link" href={media(image)} aria-label={'View ' + label.toLowerCase() + ' campaign artwork'}>
+            View campaign artwork <ArrowUpRight size={17}/>
+          </a>
+        </div>
       </article>)}</div>
     </div>
   </section>
@@ -254,9 +379,10 @@ function Footer() {
 }
 
 function App() {
+  useSmoothWheel()
   return <MotionConfig reducedMotion="user">
     <Header/>
-    <main><Hero/><Services/><Industries/><Clients/><Testimonials/><FAQ/></main>
+    <main><Hero/><Services/><Strategy/><Industries/><Clients/><Testimonials/><FAQ/></main>
     <Footer/>
   </MotionConfig>
 }
