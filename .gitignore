@@ -1,4 +1,8 @@
 node_modules/
-.vite-cache/
-dist/
-*.log
+.next/
+.env*
+!.env.example
+data/
+
+.playwright-cli/
+output/

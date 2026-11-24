@@ -1,0 +1,52 @@
+/* Campaign photography, service links and contact sections. */
+.hero-image { object-position: 66% 57%; }
+.category-icon { border: 1px solid #d5dfff; }
+.category-icon svg { stroke-width: 1.65; }
+.service-card-link:focus-visible { outline-offset: -3px; }
+.service-card-copy { display: flex; flex: 1; flex-direction: column; }
+.service-card-action { display: flex; align-items: center; gap: 5px; padding-top: 11px; margin-top: auto; font-size: .76rem; font-weight: 600; color: var(--accent); }
+.service-card-action svg { transition: transform .22s; }
+.service-card-link:hover .service-card-action svg, .service-card-link:focus-visible .service-card-action svg { transform: translate(2px,-2px); }
+
+.quote-bento figcaption strong { font-size: .94rem; }
+.quote-bento .quote-feature figcaption strong { font-size: 1.05rem; color: #e1e9ff; }
+
+.faq-section .accordion .is-open { background: #eaf0ff; }
+.faq-section .accordion button[aria-expanded=true] > svg { rotate: none; }
+.faq-section .accordion button:focus-visible { outline-offset: -3px; }
+.closing { position: relative; isolation: isolate; overflow: hidden; padding-block: clamp(65px,9vw,175px); border: 0; background: radial-gradient(ellipse at 99% 96%,#2363e9 0%,#153b85 23%,transparent 58%),#091b33; }
+.closing::before { content: ''; position: absolute; z-index: -1; inset: 0; background: repeating-radial-gradient(ellipse 115% 168% at 104% 137%,transparent 0 22px,#7fb4ff32 22px 23px,transparent 23px 31px); pointer-events: none; }
+.closing-layout { grid-template-columns: minmax(0,1fr) auto; align-items: end; gap: clamp(24px,5vw,88px); }
+.closing h2 { font-size: clamp(3rem,5vw,6.1rem); font-weight: 720; max-width: 17ch; }
+.closing p { max-width: 61ch; margin: 24px 0 0; font-size: clamp(.98rem,1.1vw,1.22rem); color: #e3edff; }
+.closing .button { border-radius: 8px; min-height: clamp(52px,3.4vw,65px); padding-inline: clamp(17px,1.4vw,26px); font-size: 1rem; color: #fff; background: #194fd3; border-color: #7b9dff55; white-space: nowrap; }
+.closing .button:hover { background: #315fe1; }
+.site-footer { padding-top: clamp(48px,5.7vw,110px); background: radial-gradient(ellipse at 0% 22%,#132e55 0%,transparent 58%),#091b33; }
+.footer-grid { grid-template-columns: minmax(0,1.45fr) minmax(0,.68fr) minmax(0,1.06fr) minmax(0,1.22fr); margin-bottom: clamp(36px,4vw,78px); }
+.footer-brand .brand img { width: clamp(158px,13vw,250px); }
+.footer-grid > .footer-brand > p { max-width: 44ch; margin-top: 18px; font-size: clamp(.9rem,1.02vw,1.12rem); }
+.footer-links { gap: 10px; font-size: clamp(.87rem,.96vw,1.06rem); }
+.footer-links h3 { color: #8bc7ff; text-transform: uppercase; letter-spacing: .1em; font-size: .82rem; font-weight: 700; margin-bottom: 11px; }
+.footer-links a, .footer-links address { gap: 10px; }
+.footer-links svg, .copyright svg { color: #8bc7ff; }
+.site-footer .socials { margin-top: 21px; gap: 9px; }
+.site-footer .socials a { display: grid; place-items: center; width: 43px; height: 43px; border: 1px solid #3a5276; font-weight: 650; text-decoration: none; transition: background .22s, border-color .22s, color .22s; }
+.site-footer .socials a:hover { background: #214479; border-color: #82aafa; color: #fff; }
+.site-footer .copyright { font-size: clamp(.82rem,.9vw,1rem); }
+.site-footer .copyright a { font-size: inherit; gap: 9px; }
+.footer-wordmark { width: fit-content; margin-inline: auto; margin-top: clamp(48px,7.4vw,132px); color: #112945; -webkit-text-stroke: 1px #496589; transition: color .4s, text-shadow .4s, -webkit-text-stroke-color .4s; }
+.footer-wordmark:hover { color: #254b7d; -webkit-text-stroke-color: #83b5ff; text-shadow: 0 0 .13em #5a9cf855; }
+@media(max-width:900px) {
+  .footer-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media(max-width:760px) {
+  .hero-layout { padding-top: clamp(90px,24vw,170px); }
+  .hero-image { height: 83%; object-position: 62% 45%; }
+  .closing-layout { grid-template-columns: 1fr; gap: 22px; }
+  .closing p { margin-top: 16px; }
+  .faq-photo { min-height: 150px; aspect-ratio: 2.25; }
+  .footer-brand, .footer-contact { grid-column: 1/-1; }
+  .footer-contact { order: 1; }
+  .footer-nav, .footer-services { order: 2; }
+}
+
