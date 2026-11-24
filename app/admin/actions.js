@@ -2,11 +2,12 @@
 import { randomUUID } from 'node:crypto'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { db } from '../store'
+import { db, hasContentStorage } from '../store'
 import { pages } from '../content'
 import { cookieName, hasAdminSession, matches, sign } from './auth'
 
 export async function login(form) {
+  if (!hasContentStorage()) redirect('/admin/')
   const password = process.env.MOVICTEL_ADMIN_PASSWORD || ''
   const expiry = String(Date.now() + 8 * 60 * 60 * 1000)
   const signature = sign(expiry)
@@ -34,7 +35,7 @@ function validLink(link) {
 }
 
 export async function savePage(form) {
-  if (!await hasAdminSession()) redirect('/admin/')
+  if (!hasContentStorage() || !await hasAdminSession()) redirect('/admin/')
   const slug = String(form.get('slug'))
   if (!Object.hasOwn(pages, slug)) redirect('/admin/')
   const back = '/admin/?page=' + encodeURIComponent(slug)

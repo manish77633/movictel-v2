@@ -3,7 +3,7 @@ import { readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { ArrowRight, ArrowUpRight, BriefcaseBusiness, ChevronRight, Files, Inbox, LayoutDashboard, Layers3, LogOut } from 'lucide-react'
 import { pages } from '../content'
-import { db, readPage } from '../store'
+import { db, hasContentStorage, readPage } from '../store'
 import { login, logout } from './actions'
 import { hasAdminSession } from './auth'
 import { Editor } from './editor'
@@ -22,6 +22,7 @@ const getArea = slug => slug.startsWith('services') ? 'services' : slug.startsWi
 const areaUrl = id => id === 'dashboard' ? '/admin/' : '/admin/?view=' + id
 
 export default async function Admin({ searchParams }) {
+  if (!hasContentStorage()) return <main className="studio-login"><p>Content Studio requires persistent storage.</p></main>
   const query = await searchParams
   if (!await hasAdminSession()) return <main className="studio-login">
     <form className="interior-form admin-login" action={login}>

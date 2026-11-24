@@ -1,10 +1,11 @@
 'use server'
 import { redirect } from 'next/navigation'
-import { db } from './store'
+import { db, hasContentStorage } from './store'
 
 export async function submitEnquiry(form) {
   const returnTo = form.get('returnTo') === 'contact' ? '/contact/' : '/book-a-consultation/'
   const anchor = returnTo === '/contact/' ? '#contact-enquiry' : ''
+  if (!hasContentStorage()) redirect(returnTo + anchor)
   const fields = ['name', 'email', 'service', 'message'].map(key => String(form.get(key) ?? '').trim())
   const phone = String(form.get('phone') ?? '').trim()
   const phoneDigits = phone.replace(/\D/g, '').length

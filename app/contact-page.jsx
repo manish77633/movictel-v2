@@ -2,6 +2,7 @@ import { ArrowDown, ArrowUpRight, MapPin, Phone } from 'lucide-react'
 import { submitEnquiry } from './enquiry'
 import { EnquiryButton } from './enquiry-button'
 import { serviceMenu } from './service-menu'
+import { hasContentStorage } from './store'
 
 const directions = 'https://maps.app.goo.gl/Uj1wDx8LmmchE3Cg6'
 const officeMap = 'https://maps.google.com/maps?q=' + encodeURIComponent('Movictel, Office 21, Tagore Nagar, 200 Ft Bypass, Jaipur') + '&z=15&output=embed'
@@ -9,6 +10,18 @@ const whatsapp = 'https://wa.me/919001955232'
 const choices = serviceMenu.flatMap(group => group.items)
 
 export function EnquiryForm({ contact = false, service, sent, invalid }) {
+  if (!hasContentStorage()) {
+    const name = choices.find(([, id]) => id === service)?.[0]
+    const message = name ? '?text=' + encodeURIComponent('Hi Movictel, I’d like to discuss ' + name + '.') : ''
+    return <div className={contact ? 'contact-form' : 'interior-form editorial-enquiry'}>
+      <h2>Tell us about your project.</h2>
+      <p>Send your project details on WhatsApp or call us directly.</p>
+      <div className="interior-links">
+        <a className="button" href={whatsapp + message}>Message on WhatsApp <ArrowUpRight size={17}/></a>
+        <a href="tel:+919001955232">Call +91 90019 55232</a>
+      </div>
+    </div>
+  }
   return <form className={'interior-form ' + (contact ? 'contact-form' : 'editorial-enquiry')} action={submitEnquiry}>
     <input type="hidden" name="returnTo" value={contact ? 'contact' : 'book-a-consultation'}/>
     {!contact && <h2>Tell us about your project.</h2>}

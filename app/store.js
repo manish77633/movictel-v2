@@ -3,6 +3,10 @@ import { mkdirSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { pages } from './content'
 
+export function hasContentStorage() {
+  return process.env.VERCEL !== '1' || Boolean(process.env.MOVICTEL_DB_PATH)
+}
+
 let database
 
 export function db() {
@@ -33,6 +37,7 @@ export function db() {
 
 export function readPage(slug, draft = false) {
   if (!Object.hasOwn(pages, slug)) return null
+  if (!hasContentStorage()) return pages[slug]
   const row = db().prepare('SELECT draft, published FROM pages WHERE slug = ?').get(slug)
   const content = draft ? row?.draft || row?.published : row?.published
   return content ? { ...pages[slug], ...JSON.parse(content) } : pages[slug]

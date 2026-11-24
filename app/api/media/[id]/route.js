@@ -1,6 +1,7 @@
-import { db } from '../../../store'
+import { db, hasContentStorage } from '../../../store'
 
 export async function GET(request, { params }) {
+  if (!hasContentStorage()) return new Response(null, { status: 404 })
   const { id } = await params
   const row = db().prepare('SELECT mime,bytes FROM assets WHERE id = ?').get(id)
   if (!row) return new Response(null, { status: 404 })
