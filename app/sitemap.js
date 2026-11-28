@@ -1,6 +1,13 @@
-import { pages } from './content'
+import { readPage, listPageSlugs } from './store'
+import { isVercelPreview, pagePath, siteOrigin } from './seo'
+
+export const dynamic = 'force-dynamic'
 
 export default function sitemap() {
-  const origin = 'https://movictel.com'
-  return [{ url: origin + '/' }, ...Object.keys(pages).map(slug => ({ url: origin + '/' + slug + '/' }))]
+  if (isVercelPreview) return []
+  return listPageSlugs().flatMap(slug => {
+    const page = readPage(slug)
+    const url = siteOrigin + pagePath(slug)
+    return page && !page.noIndex && (!page.canonical || new URL(page.canonical, siteOrigin).href === url) ? [{ url }] : []
+  })
 }

@@ -3,92 +3,76 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { serviceMenu } from './service-menu'
+import { completeChrome } from './chrome-content'
+import { LinkIcon } from './link-icon'
+import { resolveLinkIcon } from './link-icons'
+import { homeContent } from './home-content'
+import { mediaUrl, isVideo } from './media-source'
+import { SectionFrame, SectionMedia } from './section-frame'
 import { ClientLogoStrip } from './client-logo-strip'
 import { AnimatePresence, motion, MotionConfig, useInView, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import {
-  ArrowDown, ArrowDownRight, ArrowUp, ArrowUpRight, ChevronDown, CodeXml,
-  Lightbulb, MapPin, Menu, Pause, Play, Search, MessageCircle, Minus, Phone, Plus, Quote, TrendingUp, X,
+  ArrowDown, ArrowDownRight, ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, Building2, ChevronDown, Cloud, CodeXml, FilePenLine, LayoutTemplate, Megaphone, Monitor, MousePointerClick, Palette, Pause, Play, Smartphone,
+  Lightbulb, MapPin, Menu, Search, MessageCircle, MessagesSquare, Minus, Phone, Plus, Radio, TrendingUp, UserRound, X,
 } from 'lucide-react'
 import { StrategyIcon } from './strategy-icon.jsx'
-import { useSmoothWheel } from './smooth-wheel.js'
 
-const site = ''
-const book = site + '/book-a-consultation/'
-const whatsapp = 'https://wa.me/919001955232'
-const media = name => '/media/' + name
-
-
-const services = [
-  { id: 'marketing', label: 'Digital marketing', icon: TrendingUp, description: 'Get discovered and give people a reason to enquire.', items: [
-    ['Social media marketing', 'Put your offer in front of the right audience.', 'service-social.webp'],
-    ['Branding services', 'Build a recognizable identity across channels.', 'service-branding.webp'],
-    ['Website & local SEO', 'Help customers find you in search and on maps.', 'service-seo.webp'],
-    ['Content writing', 'Explain what you offer in clear, useful copy.', 'service-writing.webp'],
-  ]},
-  { id: 'promote', label: 'Cloud communications', icon: MessageCircle, description: 'Answer enquiries and follow up where customers already are.', items: [
-    ['WhatsApp Business API', 'Answer enquiries and automate customer updates.', 'service-whatsapp.webp'],
-    ['Bulk SMS', 'Send timely reminders and alerts to opted-in customers.', 'service-sms.webp'],
-    ['RCS messaging', 'Send rich messages with images and tappable actions.', 'service-rcs.webp'],
-    ['Voice SMS', 'Share a recorded update through a phone call.', 'service-voice.webp'],
-  ]},
-  { id: 'development', label: 'Web & app development', icon: CodeXml, description: 'Give customers a clear place to browse, book or get in touch.', items: [
-    ['Website development', 'Build responsive sites around what customers need to do.', 'service-website.webp'],
-    ['Mobile app development', 'Design useful apps for customers on the move.', 'service-app.webp'],
-    ['Graphic design', 'Create campaign graphics that carry your brand across channels.', 'service-graphic.webp'],
-    ['Landing page design', 'Build focused pages around one offer or action.', 'service-landing.webp'],
-  ]},
-]
-const industries = [
-  {
-    id: 'real-estate', label: 'Real estate', image: 'industry-property.webp',
-    alt: 'Illustrative Jaipur apartment development with sandstone façades and a landscaped entrance',
-    title: 'Help buyers get from search to site visit.',
-    description: 'Project films, paid campaigns and landing pages that give buyers a clear next step.',
-    href: '/services/real-estate-marketing/', action: 'Explore real estate marketing',
-  },
-  {
-    id: 'education', label: 'Education', image: 'industry-education.webp',
-    alt: 'Illustrative school campus with students crossing a shaded courtyard',
-    title: 'Give families a first look at your school.',
-    description: 'Campus films, local search and admissions campaigns that help parents decide where to enquire.',
-    href: '/contact/', action: 'Discuss school admissions',
-  },
-]
+const media = mediaUrl
 
 
 
-const questions = [
-  ['What is bulk SMS marketing and how effective is it?', 'Bulk SMS sends alerts, reminders and offers to customers who have opted in. Results depend on the audience, timing and message relevance.'],
-  ['What does a digital marketing agency do?', 'An agency plans and runs campaigns across search, social and other channels to help your business reach customers and generate enquiries.'],
-  ['How does SEO help improve website traffic and rankings?', 'SEO helps search engines understand your pages and match them to relevant searches.'],
-  ['Which digital marketing services should a small business start with?', 'A clear website and local SEO are useful starting points. Paid campaigns can help when you have a specific goal and budget.'],
-  ['How does local SEO help my business get more customers?', 'It helps nearby customers find your business and see details such as your hours, location and contact information.'],
-  ['Can social media marketing generate leads and sales?', 'Targeted campaigns can send interested people to an enquiry form, online shop or messaging channel.'],
-  ['What is the difference between Google Ads and Meta Ads?', 'Google Search Ads reach customers as they search. Meta Ads reach selected audiences across platforms such as Instagram and Facebook.'],
-  ['Can I automate messages for customer follow-ups?', 'WhatsApp Business API and SMS can support opt-in follow-ups, reminders and updates.'],
-  ['Do you offer custom website design or templates?', 'Movictel offers website development and landing page design. Contact the team to discuss the right approach for your project.'],
-]
 
-const testimonials = [
-  ['Movictel’s bulk SMS services completely transformed our customer communication process.', 'Rohit Sharma', 'E-commerce Marketing Head'],
-  ['Movictel’s WhatsApp automation services significantly improved how we connect with our customers.', 'Pooja Verma', 'CEO, Healthcare Startup'],
-  ['Movictel proved to be the best web development agency in Jaipur for our growing business needs.', 'Ashish Sen', 'Founder, Automobile Company'],
-]
 
-const navigation = [['Home', '/'], ['Blog', site + '/blog/'], ['About', site + '/about/'], ['Contact', '/contact/']]
-const socials = [['Instagram', 'https://www.instagram.com/movictel', 'IG'], ['LinkedIn', 'https://www.linkedin.com/company/movictel/', 'in'], ['Facebook', 'https://www.facebook.com/Movictel/', 'f']]
+const navigation = [['Home', '/'], ['Blog', '/blog/'], ['About', '/about/'], ['Contact', '/contact/']]
 
 function HeaderLink({ children, ...props }) {
-  return <Link {...props} scroll={false} onNavigate={() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
-  }}>{children}</Link>
+  return <Link {...props}>{children}</Link>
 }
 
-export function Header() {
+const serviceMenuIcons = [Cloud, TrendingUp, CodeXml]
+
+const serviceItemIcons = {
+  'whatsapp-business-api': MessageCircle,
+  ivr: Phone,
+  rcs: MessagesSquare,
+  'bulk-sms': Megaphone,
+  'voice-sms': Radio,
+  'real-estate-marketing': Building2,
+  'social-media-marketing-jaipur': TrendingUp,
+  seo: Search,
+  'ppc-advertising': MousePointerClick,
+  branding: Palette,
+  'content-writing': FilePenLine,
+  'web-development': Monitor,
+  'mobile-app-development': Smartphone,
+  'graphic-design': Palette,
+  'landing-page-design': LayoutTemplate,
+}
+
+export function Header({ config } = {}) {
+  const header = completeChrome('header', config)
+  const nav = header.links
+  const cta = header.cta
   const pathname = usePathname()?.replace(/\/$/, '') || '/'
   const [open, setOpen] = useState(false)
   const servicesMenu = useRef(null)
+  const hoverMenu = useRef(false)
+
+  function openOnHover(event) {
+    if (event.pointerType !== 'mouse' || !window.matchMedia('(min-width: 761px)').matches) return
+    const menu = servicesMenu.current
+    if (menu.open) return
+    hoverMenu.current = true
+    menu.open = true
+  }
+
+  function closeOnLeave(event) {
+    if (event.pointerType !== 'mouse' || !hoverMenu.current) return
+    const menu = servicesMenu.current
+    if (!menu.querySelector('.services-mega').contains(document.activeElement)) menu.open = false
+    hoverMenu.current = false
+  }
+
   useEffect(() => {
     function dismiss(event) {
       const menu = servicesMenu.current
@@ -115,34 +99,63 @@ export function Header() {
           <feComposite in2="SourceAlpha" operator="in"/>
         </filter></defs>
       </svg>
-      <HeaderLink href="/" className="brand" aria-label="Movictel home"><img src={media('logo-color.png')} alt="Movictel"/></HeaderLink>
+      <HeaderLink href="/" className="brand" aria-label="Movictel home"><img src={media(config?.logo || 'logo-color.png')} alt={config?.alt ?? 'Movictel'}/></HeaderLink>
       <button type="button" className="menu-button" aria-expanded={open} aria-controls="navigation" aria-label={open ? 'Close menu' : 'Open menu'} onClick={() => setOpen(!open)}>{open ? <X/> : <Menu/>}</button>
       <nav className={open ? 'is-open' : ''} id="navigation" aria-label="Main navigation" onClick={event => { if (event.target.closest('a')) setOpen(false) }}>
-        <HeaderLink href="/" aria-current={pathname === '/' ? 'page' : undefined}>{navigation[0][0]}</HeaderLink>
-        <details ref={servicesMenu} className="nav-services">
-          <summary>Services <ChevronDown size={14}/></summary>
+        <HeaderLink href="/" aria-current={pathname === '/' ? 'page' : undefined}>{config?.homepageLabel ?? navigation[0][0]}</HeaderLink>
+        {config?.showServices !== false && <details ref={servicesMenu} className="nav-services" onPointerLeave={closeOnLeave}
+          onBlur={event => {
+            if (!event.currentTarget.contains(event.relatedTarget) && !event.currentTarget.matches(':hover')) {
+              event.currentTarget.open = false
+            }
+          }}>
+          <summary onPointerEnter={openOnHover} onClick={event => {
+            if (hoverMenu.current && event.detail && event.currentTarget.parentElement.open) event.preventDefault()
+            hoverMenu.current = false
+          }}>{config?.servicesLabel ?? 'Services'} <ChevronDown size={14}/></summary>
           <div className="services-mega" onClick={event => { if (event.target.closest('a')) servicesMenu.current.open = false }}>
             <div className="mega-columns">
-              {serviceMenu.map(group => <section key={group.id} aria-label={group.title}>
-                <h2>{group.title}</h2>
-                <ul>{group.items.map(([label, slug, detail]) => <li key={slug}>
-                  <HeaderLink href={'/services/' + slug + '/'}><strong>{label}</strong><small>{detail}</small></HeaderLink>
-                </li>)}</ul>
-              </section>)}
+              {header.serviceGroups.map((group, index) => {
+                const Icon = serviceMenuIcons[index % serviceMenuIcons.length]
+                return <section key={index} aria-label={group.heading}>
+                  <h2><Icon size={18} aria-hidden="true"/>{group.heading}</h2>
+                  <ul>{group.links.filter(link => link.href && link.label).map(({ label, href, text }, linkIndex) => {
+                    const slug = href.match(/^\/services\/([^/]+)\/?$/)?.[1]
+                    const ItemIcon = serviceItemIcons[slug] || ArrowUpRight
+                    return <li key={linkIndex}>
+                      <HeaderLink href={href}>
+                        <span className="mega-item-icon" aria-hidden="true"><ItemIcon size={16}/></span>
+                        <span className="mega-item-copy"><strong>{label}</strong><small>{text}</small></span>
+                      </HeaderLink>
+                    </li>
+                  })}</ul>
+                </section>
+              })}
             </div>
-            <div className="mega-footer"><HeaderLink href="/services/">Explore all services <ArrowUpRight size={15}/></HeaderLink></div>
+            {header.servicesButton.href && header.servicesButton.label && <div className="mega-footer">
+              <HeaderLink href={header.servicesButton.href}>{header.servicesButton.label} <ArrowUpRight size={15}/></HeaderLink>
+            </div>}
           </div>
-        </details>
-        {navigation.slice(1).map(([label, href]) => <HeaderLink key={label} href={href} aria-current={pathname === href.replace(/\/$/, '') ? 'page' : undefined}>{label}</HeaderLink>)}
-        <HeaderLink className="button mobile-book" href={book}>Book a consultation <ArrowUpRight size={16}/></HeaderLink>
+        </details>}
+        {nav.map(([label, href]) => <HeaderLink key={label} href={href} aria-current={pathname === href.replace(/\/$/, '') ? 'page' : undefined}>{label}</HeaderLink>)}
+        {config?.showCta !== false && <HeaderLink className="button mobile-book" href={cta[1]}>{cta[0]} <ArrowUpRight size={16}/></HeaderLink>}
       </nav>
-      <HeaderLink className="button nav-book" href={book}>Book a consultation <ArrowUpRight size={16}/></HeaderLink>
+      {config?.showCta !== false && <HeaderLink className="button nav-book" href={cta[1]}>{cta[0]} <ArrowUpRight size={16}/></HeaderLink>}
     </div>
   </header>
 }
 
-function Hero() {
+function ContentButton({ button, className = 'button', icon: Icon = ArrowUpRight }) {
+  if (!button.label || !button.href) return null
+  return <Link className={className} href={button.href}>{button.label} <Icon size={17} aria-hidden="true"/></Link>
+}
+
+function Hero({ page, content, defaultTitle }) {
+  const video = isVideo(content.media, content.media === page.image ? page.mediaType : '')
+  const poster = video ? media(content.poster) : undefined
+  const headlines = content.rotatingHeadlines
   const reduceMotion = useReducedMotion()
+  const [service, setService] = useState(0)
   const videoRef = useRef(null)
   const [playing, setPlaying] = useState(false)
 
@@ -155,52 +168,63 @@ function Hero() {
     }
   }
 
-  return <section className="hero" id="home" aria-labelledby="hero-title">
-    <img className="hero-image" src={media('estate-hero.jpg')} alt="" fetchPriority="high"/>
-    {!reduceMotion && <>
-      <video ref={videoRef} className="hero-image hero-video" src={media('estate-hero.mp4')}
-        poster={media('estate-hero.jpg')} autoPlay loop muted playsInline aria-hidden="true"
-        onPlaying={() => setPlaying(true)} onPause={() => setPlaying(false)}/>
-      <button className="hero-video-toggle" type="button" onClick={toggleVideo}
-        aria-label={playing ? 'Pause background video' : 'Play background video'}>
-        {playing ? <Pause size={17}/> : <Play size={17}/>}
-      </button>
-    </>}
+  useEffect(() => {
+    const video = videoRef.current
+    const timer = reduceMotion || !headlines.length ? null : window.setInterval(() => setService(index => (index + 1) % headlines.length), 2500)
+    if (video && reduceMotion) {
+      video.pause()
+    } else {
+      video?.play().catch(() => {})
+    }
+    return () => window.clearInterval(timer)
+  }, [reduceMotion, content.media, headlines.length])
+
+  return <section className="hero home-hero" id="home-hero" aria-labelledby="hero-title">
+    {(poster || (!video && content.media)) && <img className="hero-image" src={poster || media(content.media)} alt={content.imageAlt} fetchPriority="high"/>}
+    {video && <video ref={videoRef} className="hero-image hero-video" src={media(content.media)}
+      poster={poster} loop muted playsInline aria-hidden="true"
+      onPlaying={() => setPlaying(true)} onPause={() => setPlaying(false)}/>}
+    {video && <button className="hero-video-toggle" type="button" onClick={toggleVideo}
+      aria-label={playing ? 'Pause background video' : 'Play background video'}>
+      {playing ? <Pause size={17}/> : <Play size={17}/>}
+    </button>}
     <div className="wrap hero-layout">
       <div className="hero-copy">
-        <p className="location"><MapPin size={16}/> Jaipur, Rajasthan</p>
-        <h1 id="hero-title">Get found.<br/>Start conversations.</h1>
-        <p className="hero-intro">Movictel brings digital marketing, business messaging and web development together to turn interest into enquiries.</p>
-        <div className="hero-actions">
-          <a className="button" href={book}>Book a consultation <ArrowUpRight size={17}/></a>
-          <a className="button secondary" href="#services">Explore services <ArrowDown size={17}/></a>
+        <p className="hero-channels">{content.label}</p>
+        <h1 id="hero-title">
+          {!content.rotateHeadlines || !headlines.length || content.heading !== defaultTitle ? <span>{content.heading}</span> : <>
+          <span className="sr-only">{content.heading}</span>
+          <span aria-hidden="true">{content.rotatingPrefix}</span>
+          <span className="hero-service" aria-hidden="true">
+            {headlines.map((label, index) => <span key={label} data-active={index === service % headlines.length}>{label}</span>)}
+          </span>
+          <span aria-hidden="true">{content.rotatingSuffix}</span></>}
+        </h1>
+        <p className="hero-intro">{content.text}</p>
+        <div className="hero-actions cms-buttons" data-position={content.buttonPosition}>
+          <ContentButton button={content.primaryButton}/>
+          <ContentButton button={content.secondaryButton} className="button secondary" icon={ArrowDown}/>
         </div>
       </div>
       <div className="hero-index" aria-label="Explore Movictel services">
-        {services.map(({id, label}) => <a href={'#' + id} key={id}>{label}<ArrowDownRight size={19}/></a>)}
+        {content.quickLinks.map((button, index) => <ContentButton key={index} button={button} className="" icon={ArrowDownRight}/>)}
       </div>
     </div>
   </section>
 }
 
 
-const strategySteps = [
-  { lead: 'From', title: 'Insights', icon: Search, text: 'We study your audience, market and competitors to see what drives interest and where customers drop off.' },
-  { lead: 'To', title: 'Ideas', icon: Lightbulb, text: 'We turn what we learn into campaign concepts, clear messaging and pages that give people a reason to act.' },
-  { lead: 'To', title: 'Impact', icon: TrendingUp, text: 'We launch, track enquiries and refine the campaign based on what brings qualified leads.' },
-]
-
-function Strategy() {
+function Strategy({ content }) {
   const reduce = useReducedMotion()
   return <section className="strategy" id="strategy" aria-labelledby="strategy-title">
     <div className="strategy-growth" aria-hidden="true"/>
     <div className="wrap strategy-inner">
-      <h2 id="strategy-title">Our strategy</h2>
+      <h2 id="strategy-title">{content.heading}</h2>
       <ol className="strategy-steps">
-        {strategySteps.map(({ lead, title, icon: Icon, text }) => <li key={title}>
-          <StrategyIcon kind={title} fallback={Icon} reducedMotion={reduce}/>
+        {content.steps.map(({ prefix, heading, text }, index) => <li key={index}>
+          <StrategyIcon kind={['Insights', 'Ideas', 'Impact'][index % 3]} fallback={[Search, Lightbulb, TrendingUp][index % 3]} reducedMotion={reduce}/>
           <div className="strategy-step-copy">
-            <h3><span>{lead}</span> {title}</h3>
+            <h3><span>{prefix}</span> {heading}</h3>
             <p>{text}</p>
           </div>
         </li>)}
@@ -219,26 +243,11 @@ function RevealHeading({ children, id }) {
   </h2>
 }
 
-const serviceHighlights = {
-  'service-social.webp': ['Content calendars', 'Reels and paid campaigns'],
-  'service-branding.webp': ['Brand positioning', 'Identity and templates'],
-  'service-seo.webp': ['Local listings', 'Search and website audit'],
-  'service-writing.webp': ['Website copy', 'Campaign messaging'],
-  'service-whatsapp.webp': ['Enquiry replies', 'Visit reminders and handoff'],
-  'service-sms.webp': ['Appointment reminders', 'Service alerts'],
-  'service-rcs.webp': ['Branded message cards', 'Buttons and SMS fallback'],
-  'service-voice.webp': ['Recorded announcements', 'Scheduled calls'],
-  'service-website.webp': ['Responsive layouts', 'Pages and enquiry forms'],
-  'service-app.webp': ['Task flows', 'Mobile interface prototypes'],
-  'service-graphic.webp': ['Social and ad artwork', 'Print-ready files'],
-  'service-landing.webp': ['Campaign pages', 'Lead capture and tracking'],
-}
-
-function ServiceArtwork({ image }) {
+function ServiceArtwork({ image, alt }) {
   const isPhoto = image === 'service-social.webp'
   return <figure className="service-figure">
     <div className={'service-art ' + (isPhoto ? 'service-art--photo' : 'service-art--cutout')}>
-      <img src={media(image)} alt="" loading="lazy"/>
+      <SectionMedia value={image} alt={alt}/>
     </div>
   </figure>
 }
@@ -287,7 +296,7 @@ function ServiceIndex({ groupId, items }) {
 
   return <nav className="service-index" aria-label="Services in this category">
     <ul>
-      {items.map(([name], index) => <li key={name}>
+      {items.map(([name], index) => <li key={index}>
         <a href={'#' + groupId + '-service-' + index} onClick={event => jump(event, index)}
           aria-current={index === active ? 'location' : undefined}>
           {name}<ArrowDownRight size={15} aria-hidden="true"/>
@@ -297,93 +306,74 @@ function ServiceIndex({ groupId, items }) {
   </nav>
 }
 
-function Services() {
+function Services({ content }) {
   const reduce = useReducedMotion()
   return <section className="section service-section" id="services" aria-labelledby="services-heading">
     <div className="wrap">
-      <div className="section-heading"><RevealHeading id="services-heading">Find the right service.</RevealHeading><p>Choose a specific service or bring marketing, messaging and development together.</p></div>
-      {services.map(({ id, label, description, icon: Icon, items }) => <section key={id} id={id} className="service-group" aria-labelledby={id + '-heading'}>
+      <div className="section-heading"><RevealHeading id="services-heading">{content.heading}</RevealHeading><p>{content.text}</p></div>
+      {Object.entries(content.groups).map(([id, group]) => {
+        const Icon = { marketing: TrendingUp, promote: MessageCircle, development: CodeXml }[id]
+        return <section key={id} id={id} className="service-group" aria-labelledby={id + '-heading'}>
         <div className="service-group-heading">
           <div className="service-group-title">
-            <h3 id={id + '-heading'}>{label}</h3>
+            <h3 id={id + '-heading'}>{group.heading}</h3>
             <span className="category-icon" aria-hidden="true"><Icon size={17}/></span>
           </div>
-          <p>{description}</p>
-          <ServiceIndex groupId={id} items={items}/>
+          <p>{group.text}</p>
+          <ServiceIndex groupId={id} items={group.cards.map(card => [card.heading])}/>
         </div>
-        <ul className="service-grid">{items.map(([name, detail, image], index) => {
-          const deliverables = serviceHighlights[image]
-          return <li className="service-card" id={id + '-service-' + index} tabIndex={-1} key={name} style={{ "--stack-index": index }}>
+        <ul className="service-grid">{group.cards.map(({ heading, text, image, imageAlt, deliverables, button }, index) => {
+          const CardLink = button.href ? Link : 'div'
+          return <li className="service-card" id={id + '-service-' + index} tabIndex={-1} key={index} style={{ "--stack-index": index }}>
 
-          <a className="service-card-link" href={whatsapp + '?text=' + encodeURIComponent('Hi Movictel, I would like to know more about ' + name + '.')}>
+          <CardLink className="service-card-link" {...(button.href ? { href: button.href } : {})}>
             <div className="service-card-copy">
               <motion.div initial={reduce ? false : { y: 32, opacity: 0 }}
                 whileInView={{ y: 0, opacity: 1 }} viewport={{ once: true, amount: .25 }}
                 transition={{ duration: reduce ? 0 : .55, ease: [.22, 1, .36, 1] }}>
-                <h4>{name}</h4><p>{detail}</p>
+                <h4>{heading}</h4><p>{text}</p>
                 <ul className="service-deliverables">{deliverables.map(item => <li key={item}>{item}</li>)}</ul>
-                <span className="service-card-action">Ask on WhatsApp <ArrowUpRight size={14}/></span>
+                {button.href && button.label && <span className="service-card-action">{button.label} <ArrowUpRight size={14}/></span>}
               </motion.div>
             </div>
-            <ServiceArtwork image={image}/>
-          </a>
+            <ServiceArtwork image={image} alt={imageAlt}/>
+          </CardLink>
 
         </li>})}</ul>
-      </section>)}
-      <a className="text-link service-directory" href={site + '/services/'}>Browse Movictel’s service pages <ArrowUpRight size={17}/></a>
+      </section>})}
+      <ContentButton button={content.directoryButton} className="text-link service-directory"/>
     </div>
   </section>
 }
 
 
-function Industries() {
-  const reduce = useReducedMotion()
-  return <section className="section industries industry-showcase" id="industries" aria-labelledby="industries-heading">
-    <div className="wrap">
-      <div className="section-heading">
-        <RevealHeading id="industries-heading">Built for your industry.</RevealHeading>
-        <p>Help property buyers book a visit and families find the right school.</p>
+function IvrFeature({ content }) {
+  return <section className="ivr-feature" id="ivr" aria-labelledby="ivr-feature-title">
+    <div className="wrap ivr-feature-grid">
+      <div>
+        <h2 id="ivr-feature-title">{content.heading}</h2>
+        <h3>{content.subheading}</h3>
+        <p>{content.text}</p>
+        <ul>{content.points.map((point, index) => <li key={index}>{point}</li>)}</ul>
+        <div className="ivr-feature-actions cms-buttons" data-position={content.buttonPosition}>
+          <ContentButton button={content.primaryButton}/>
+          <ContentButton button={content.secondaryButton} className="ivr-feature-link"/>
+        </div>
       </div>
-      <div className="industry-showcase-grid">
-        {industries.map(({ id, label, image, alt, title, description, href, action }) => <motion.article
-          className="industry-story-card" key={id} id={id}
-          initial={reduce ? false : { y: 24 }} whileInView={{ y: 0 }}
-          viewport={{ once: true, amount: .18 }} transition={{ duration: reduce ? 0 : .45, ease: 'easeOut' }}>
-          <Link href={href} className="industry-story-link">
-            <figure className="industry-story-photo">
-              <img src={media(image)} alt={alt} width={1440} height={960} loading="lazy"/>
-            </figure>
-            <div className="industry-story-copy">
-              <p className="industry-story-label">{label}</p>
-              <h3>{title}</h3>
-              <p>{description}</p>
-              <span className="industry-story-action">{action}<span><ArrowUpRight size={18} aria-hidden="true"/></span></span>
-            </div>
-          </Link>
-        </motion.article>)}
-      </div>
+      <SectionMedia value={content.media} alt={content.imageAlt}/>
     </div>
   </section>
 }
 
-function Clients() {
-  return <div className="section clients"><div className="wrap"><ClientLogoStrip/></div></div>
+function Clients({ content }) {
+  return <div className="section clients"><div className="wrap"><ClientLogoStrip title={content.heading} logos={content.logos}/></div></div>
 }
-
-const testimonialOrder = [testimonials[1], testimonials[0], testimonials[2]]
-
-const clientDemos = [
-  { id: 'messaging', title: 'Business messaging' },
-  { id: 'sms', title: 'SMS campaigns' },
-  { id: 'web', title: 'Web development' },
-  { id: 'property', title: 'Property marketing' },
-]
 
 function ClientDemo({ demo, active, onActivate, reducedMotion }) {
   const player = useRef(null)
   useEffect(() => {
     const video = player.current
-    if (!active) {
+    if (video && !active) {
       video.muted = true
       if (reducedMotion) video.pause()
       else video.play().catch(() => {})
@@ -393,80 +383,115 @@ function ClientDemo({ demo, active, onActivate, reducedMotion }) {
   function open() {
     const video = player.current
     video.muted = false
-    onActivate(demo.id)
+    onActivate(demo)
     video.play().catch(() => {})
   }
 
   return <article className="client-video-card">
     <div className="client-video-media">
+      {isVideo(demo.media) ? <>
       <video ref={player} muted={!active} autoPlay={!active && !reducedMotion} controls={active} loop={!active} playsInline
-        poster={media('client-demo-' + demo.id + '.jpg?v=2')} preload="metadata" src={media('client-demo-' + demo.id + '.mp4?v=2')}
-        aria-label={demo.title + ' demo video'}/>
+        poster={media(demo.poster)} preload="metadata" src={media(demo.media)}
+        aria-label={demo.heading + ' demo video'}/>
       {!active && <button className="client-video-open" type="button" onClick={open}
-        aria-label={'Show ' + demo.title + ' playback controls'}/>}
+        aria-label={'Show ' + demo.heading + ' playback controls'}/>}
+      </> : <SectionMedia value={demo.media} alt={demo.heading}/>}
     </div>
   </article>
 }
 
-function Testimonials() {
+function Testimonials({ content }) {
   const rail = useRef(null)
-  const [activeDemo, setActiveDemo] = useState(null)
+  const [activeReview, setActiveReview] = useState(1)
   const reduce = useReducedMotion()
+  const count = content.reviews.length
+
+  function centerReview(index, behavior) {
+    const list = rail.current
+    const card = list.children[index]
+    if (!card) return
+    list.scrollTo({ left: card.offsetLeft + (card.offsetWidth - list.clientWidth) / 2, behavior })
+  }
+
+  useEffect(() => {
+    centerReview(content.reviews.length > 1 ? 1 : 0, 'instant')
+  }, [])
+
+  function updateActiveReview() {
+    const list = rail.current
+    const center = list.scrollLeft + list.clientWidth / 2
+    const distances = Array.from(list.children, card => Math.abs(card.offsetLeft + card.offsetWidth / 2 - center))
+    setActiveReview(distances.indexOf(Math.min(...distances)))
+  }
 
   function move(direction) {
-    const list = rail.current
-    const step = list.children[1].offsetLeft - list.children[0].offsetLeft
-    const end = list.scrollWidth - list.clientWidth
-    let left = list.scrollLeft + direction * step
-    if (direction > 0 && list.scrollLeft >= end - 2) left = 0
-    if (direction < 0 && list.scrollLeft <= 2) left = end
-    list.scrollTo({ left, behavior: reduce ? 'instant' : 'smooth' })
+    if (!count) return
+    centerReview((activeReview + direction + count) % count, reduce ? 'instant' : 'smooth')
   }
 
   return <section className="section testimonials" aria-labelledby="testimonials-heading">
     <div className="wrap">
       <div className="review-heading">
         <div>
-          <RevealHeading id="testimonials-heading">What our clients say</RevealHeading>
-          <p>Feedback from teams using Movictel for messaging and web development.</p>
+          <span className="review-label">{content.label}</span>
+          <h2 id="testimonials-heading">{content.heading === homeContent.reviews.heading ? <>We became part of their <em>success stories</em></> : content.heading}</h2>
+          <p>{content.text}</p>
         </div>
         <div className="testimonial-controls">
-          <button className="carousel-button" type="button" aria-label="Previous review" aria-controls="review-rail" onClick={() => move(-1)}><ArrowDown size={18} className="quote-prev"/></button>
-          <button className="carousel-button" type="button" aria-label="Next review" aria-controls="review-rail" onClick={() => move(1)}><ArrowDown size={18} className="quote-next"/></button>
+          <button className="carousel-button" type="button" aria-label="Previous review" aria-controls="review-rail" onClick={() => move(-1)}><ArrowLeft size={18}/></button>
+          <button className="carousel-button" type="button" aria-label="Next review" aria-controls="review-rail" onClick={() => move(1)}><ArrowRight size={18}/></button>
         </div>
       </div>
-      <ul className="review-rail" id="review-rail" ref={rail} aria-label="Client reviews" tabIndex={0}>
-        {testimonialOrder.map(([copy, name, role]) => <li key={name}>
+      <ul className="review-rail" id="review-rail" ref={rail} aria-label="Client reviews" tabIndex={0}
+        onScroll={updateActiveReview} onKeyDown={event => {
+          if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
+          event.preventDefault()
+          move(event.key === 'ArrowLeft' ? -1 : 1)
+        }}>
+        {content.reviews.map(({ text, name, role }, index) => <li key={index} className={index === activeReview ? 'is-featured' : undefined}>
           <figure className="review-card">
-            <Quote size={23} aria-hidden="true"/>
-            <blockquote>“{copy}”</blockquote>
-            <figcaption><strong>{name}</strong><span>{role}</span></figcaption>
+            <span className="review-quote" aria-hidden="true">“</span>
+            <blockquote>{text}</blockquote>
+            <figcaption>
+              <span className="review-avatar" aria-hidden="true"><UserRound size={24}/></span>
+              <div><strong>{name}</strong><span>{role}</span></div>
+            </figcaption>
           </figure>
         </li>)}
       </ul>
-      <div className="client-video-section">
-        <h3>Client videos</h3>
-        <p className="client-video-note">Sample stock footage</p>
-        <div className="client-video-grid">
-          {clientDemos.map(demo => <ClientDemo key={demo.id} demo={demo}
-            active={activeDemo === demo.id} onActivate={setActiveDemo} reducedMotion={reduce}/>)}
-        </div>
+      <div className="review-pagination" aria-label="Select a client review">
+        {content.reviews.map(({ name, role }, index) => <button key={index} type="button"
+          aria-label={role === 'Sample review' ? 'Show sample review for ' + name : 'Show review from ' + name} aria-current={index === activeReview ? 'true' : undefined}
+          aria-controls="review-rail" onClick={() => centerReview(index, reduce ? 'instant' : 'smooth')}/>)}
       </div>
     </div>
   </section>
 }
 
-function FAQ() {
+function ClientVideos({ content }) {
+  const [active, setActive] = useState(null)
+  const reduce = useReducedMotion()
+  return <section className="testimonials client-videos"><div className="wrap client-video-section">
+    <h2>{content.heading}</h2>
+    <p className="client-video-note">{content.text}</p>
+    <div className="client-video-grid">
+      {content.videos.map((demo, index) => <ClientDemo key={index} demo={demo}
+        active={active === demo} onActivate={setActive} reducedMotion={reduce}/>)}
+    </div>
+  </div></section>
+}
+
+function FAQ({ content }) {
   const [active, setActive] = useState(0)
   const reduce = useReducedMotion()
-  return <section className="section faq-section"><div className="wrap faq-layout">
+  return <section className="section faq-section" id="faq"><div className="wrap faq-layout">
     
     <div className="faq-aside">
-      <div><RevealHeading>Good questions.</RevealHeading><p>What to know before choosing your next marketing or messaging service.</p></div>
-      <figure className="faq-photo"><img src={media('web.jpg')} alt="A laptop and monitor on a development workspace" loading="lazy"/><figcaption><span>Have a question about your project?</span><a className="button" href={whatsapp}>Ask on WhatsApp <ArrowUpRight size={16}/></a></figcaption></figure>
+      <div><RevealHeading>{content.heading}</RevealHeading><p>{content.text}</p></div>
+      <figure className="faq-photo"><SectionMedia value={content.media} alt={content.imageAlt}/><figcaption><span>{content.caption}</span><ContentButton button={content.button}/></figcaption></figure>
     </div>
 
-    <div className="accordion">{questions.map(([question, answer], i) => <div key={question} className={active === i ? 'is-open' : undefined}>
+    <div className="accordion">{content.questions.map(({ question, answer }, i) => <div key={i} className={active === i ? 'is-open' : undefined}>
       <button aria-expanded={active === i} aria-controls={'answer-' + i} type="button" onClick={() => setActive(active === i ? -1 : i)}>{question}{active === i ? <Minus size={19}/> : <Plus size={19}/>}</button>
       <div id={'answer-' + i}><AnimatePresence initial={false}>{active === i && <motion.div className="answer" initial={{height:0,opacity:0}} animate={{height:'auto',opacity:1}} exit={{height:0,opacity:0}} transition={{duration:reduce ? 0 : .22}}><p>{answer}</p></motion.div>}</AnimatePresence></div>
     </div>)}</div>
@@ -484,41 +509,55 @@ const footerServices = [
   ['Graphic Design & Landing Pages', '#development'],
 ]
 
-export function Footer() {
+export function Closing({ content = homeContent.closing }) {
+  return <section className="closing" id="contact" aria-labelledby="closing-title">
+    <div className="wrap closing-layout">
+      <div><RevealHeading id="closing-title">{content.heading === homeContent.closing.heading ? <>Ready to grow<br className="desktop-break"/> your business?</> : content.heading}</RevealHeading>
+        <p>{content.text}</p></div>
+      <div className="cms-button-slot" data-position={content.buttonPosition}><ContentButton button={content.button}/></div>
+    </div>
+  </section>
+}
+
+export function Footer({ config, omitClosing = false } = {}) {
+  const footer = completeChrome('footer', config)
   return <>
-    <section className="closing" id="contact" aria-labelledby="closing-title">
-      <div className="wrap closing-layout">
-        <div><RevealHeading id="closing-title">Ready to grow<br className="desktop-break"/> your business?</RevealHeading>
-          <p>Tell us about your business, goals and current campaigns. We’ll help you choose where to start, from SEO and paid ads to business messaging.</p></div>
-        <a href={book} className="button">Get started <ArrowUpRight size={20}/></a>
-      </div>
-    </section>
+    {!omitClosing && footer.showClosing && <Closing content={footer.closing}/>}
     <footer className="site-footer">
       <div className="wrap">
         <div className="footer-grid">
-          <div className="footer-brand"><a href="/" className="brand"><img src={media('logo.webp')} alt="Movictel"/></a>
-            <p>Movictel is a digital marketing agency in Jaipur offering internet marketing and cloud communication services.</p>
-            <div className="socials">{socials.map(([name, href, mark]) => <a key={name} href={href} aria-label={name}>{mark}</a>)}</div>
+          <div className="footer-brand"><a href="/" className="brand"><img src={media(footer.logo || 'logo.webp')} alt={footer.alt}/></a>
+            <p>{footer.brandText}</p>
+            <div className="socials">{footer.socials.map(([name, href, selected = 'auto'], index) => {
+              const icon = resolveLinkIcon(selected, href)
+              return <a key={index} href={href} aria-label={name} title={name}>
+                {icon === 'none' ? name : <LinkIcon icon={icon}/>}
+              </a>
+            })}</div>
           </div>
+          {config ? config.columns.map(({ title, links }, index) => <div className="footer-links" key={index}><h3>{title}</h3>{links.map(([label, href, icon = 'none'], i) => <Link key={i} href={href}>
+            <LinkIcon icon={resolveLinkIcon(icon, href)} size={15}/> {label}
+          </Link>)}</div>) : <>
           <div className="footer-links footer-nav"><h3>Navigate</h3><Link href="/">Home</Link><Link href="/services/">Services</Link>{navigation.slice(1).map(([label, href]) => <Link key={label} href={href}>{label}</Link>)}</div>
           <div className="footer-links footer-services"><h3>Services</h3>{footerServices.map(([label,href]) => <Link key={label} href={href}>{label}</Link>)}</div>
-          <div className="footer-links footer-contact"><h3>Visit &amp; contact</h3>
-            <address><MapPin size={19}/> Office 21, Tagore Nagar, Satya Colony, near Gopi Tower, C. M. Gora Hospital, 200 Ft Bypass, Ajmer Road, Jaipur, Rajasthan 302021</address>
-            <a href="tel:+919001955232"><Phone size={17}/> +91 90019 55232</a>
-            <a href={whatsapp}><MessageCircle size={17}/> WhatsApp us</a>
+          </>}
+          <div className="footer-links footer-contact"><h3>{footer.contact.heading}</h3>
+            <address><MapPin size={19}/> {footer.contact.text}</address>
+            {footer.contact.phone && <a href={'tel:' + footer.contact.phone.replace(/[^+0-9]/g, '')}><Phone size={17}/> {footer.contact.phone}</a>}
+            {footer.contact.whatsapp.href && <a href={footer.contact.whatsapp.href}><MessageCircle size={17}/> {footer.contact.whatsapp.label}</a>}
           </div>
         </div>
-        <div className="copyright"><span>© {new Date().getFullYear()} Movictel. All rights reserved.</span><a href="#home">Back to top <ArrowUp size={17}/></a></div>
+        <div className="copyright"><span>{config?.copyright ?? ('© ' + new Date().getFullYear() + ' Movictel. All rights reserved.')}</span><a href="#home">{footer.backToTop} <ArrowUp size={17}/></a></div>
       </div>
       <div className="footer-wordmark" aria-hidden="true">movictel</div>
     </footer>
   </>
 }
 
-function ExploreMovictel() {
+function ExploreMovictel({ content }) {
   const section = useRef(null)
   const video = useRef(null)
-  const visible = useInView(video, { amount: .55 })
+  const visible = useInView(section, { amount: .55 })
   const reducedMotion = useReducedMotion()
   const [revealing, setRevealing] = useState(false)
   const { scrollYProgress } = useScroll({ target: section, offset: ['start start', 'end end'] })
@@ -532,32 +571,42 @@ function ExploreMovictel() {
 
   useEffect(() => {
     const player = video.current
+    if (!player) return
     if (!visible || (!revealing && !window.matchMedia('(max-height: 479px)').matches)) player.pause()
     else if (!reducedMotion && player.muted) player.play().catch(() => {})
-  }, [visible, revealing, reducedMotion])
+  }, [visible, revealing, reducedMotion, content.media])
 
   return <section className="home-explore" ref={section} aria-labelledby="home-explore-title">
     <div className="home-explore-stage">
-      <motion.h2 id="home-explore-title" style={{ scale, opacity: headingOpacity }}>Explore Movictel</motion.h2>
+      <motion.h2 id="home-explore-title" style={{ scale, opacity: headingOpacity }}>{content.heading}</motion.h2>
       <motion.div className="home-explore-picture" style={{ visibility: videoVisibility, opacity: videoOpacity, clipPath: crop }}>
-        <video ref={video} controls muted playsInline preload="metadata"
-          poster={media('explore-movictel.webp')} src={media('explore-movictel.mp4')}
-          width={1920} height={1080} aria-labelledby="home-explore-title"/>
+        {isVideo(content.media) ? <video ref={video} muted loop playsInline preload="metadata"
+          poster={media(content.poster)} src={media(content.media)} width={1920} height={1080} aria-labelledby="home-explore-title"/>
+          : <SectionMedia value={content.media} alt={content.imageAlt}/>}
       </motion.div>
     </div>
   </section>
 }
 
-export default function App() {
-  useSmoothWheel()
+const homeRenderers = {
+  hero: Hero, services: Services, strategy: Strategy, explore: ExploreMovictel, ivr: IvrFeature,
+  clients: Clients, reviews: Testimonials, 'client-videos': ClientVideos, faq: FAQ, closing: Closing,
+}
+
+export default function App({ enquiry, page, defaultTitle, header, footer, sections, layout }) {
   return <MotionConfig reducedMotion="user">
-    <Header/>
-    <main>
-      <Hero/><Services/><Strategy/>
-      <ExploreMovictel/>
-      <Industries/><Clients/><Testimonials/><FAQ/>
+    <Header config={header}/>
+    <main id="home">
+      {!layout.find(section => section.id === 'hero')?.visible && <h1 className="sr-only">{page.title}</h1>}
+      {layout.map(section => {
+        const Component = homeRenderers[section.id]
+        return <React.Fragment key={section.id}>
+          {section.id === 'enquiry' && sections}
+          <SectionFrame section={section}>{Component ? <Component content={section.content} page={page} defaultTitle={defaultTitle}/> : enquiry}</SectionFrame>
+        </React.Fragment>
+      })}
     </main>
-    <Footer/>
+    <Footer config={footer} omitClosing/>
   </MotionConfig>
 }
 

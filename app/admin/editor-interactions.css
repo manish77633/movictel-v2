@@ -1,0 +1,17 @@
+.studio .studio-section-with-tools > details > summary { padding-inline-end: 145px; }
+.studio-section-publish { justify-content: flex-end; }
+.studio-save-feedback {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #176442;
+  font-size: .84rem;
+  font-weight: 650;
+}
+.studio-save-feedback:empty { display: none; }
+@media (max-width: 640px) {
+  .studio .studio-section-with-tools > details > summary { padding-inline-end: 115px; }
+  .studio-section-with-tools > .studio-order { gap: 4px; }
+  .studio .studio-section-with-tools > .studio-order button:not(.button) { padding-inline: 6px; }
+  .studio-save-feedback { flex: 1 0 100%; order: -1; }
+}

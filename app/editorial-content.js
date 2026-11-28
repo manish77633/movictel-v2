@@ -68,7 +68,7 @@ export function enrich(pages) {
         ['Confirm Saturday', 'Your visit request is in. The sales team will confirm your time.'],
         ['Talk to the team', 'A sales adviser can help with availability and directions.'],
       ] },
-      add: { heading: 'Start with the messages you send most', text: 'Organize common questions, approved templates and escalation rules. Keep the team in control of conversations that need a person.', points: ['Enquiry responses and shared inboxes', 'Appointment reminders and confirmations', 'Consent, templates and team handoff'] },
+      add: { heading: 'Plan how customers enter the conversation', text: 'Decide where customers start a chat, how you’ll record their permission for business-initiated messages and who handles replies that need a person.', points: ['Shared inbox and reply ownership', 'Templates for reminders and confirmations', 'A handoff path for exceptions'] },
     },
   }
   for (const [key, { intro, scenario, add }] of Object.entries(communications)) {
@@ -79,21 +79,27 @@ export function enrich(pages) {
   }
 
   const additional = [
-    ['seo', 'SEO for local discovery', 'seo.jpg', 'Technical audits, keyword mapping and local search improvements for businesses that want customers to find the right page.', 'Audit before rewriting', 'Review indexing, page structure and local listings. Prioritize fixes where they make it easier for customers to find the service and enquire.', ['Local listings', 'Technical SEO', 'Keyword and page mapping']],
+    ['seo', 'SEO for local businesses', 'seo.jpg', 'Improve how customers find your services on Google with technical SEO, clearer website pages and an accurate Google Business Profile.', 'What the audit covers', 'We check how Google discovers your priority pages, how well those pages answer relevant searches and whether your local business details are accurate.', ['Crawling, indexing and internal links', 'Service pages and search intent', 'Google Business Profile review']],
     ['ppc-advertising', 'Google and Meta Ads', 'seo.jpg', 'Plan, launch and improve paid campaigns around enquiries, appointments or sales.', 'Set up a campaign you can measure', 'Define the audience, budget, conversion action and destination page. Review enquiry quality alongside campaign cost.', ['Search campaigns', 'Paid social', 'Conversion tracking']],
     ['branding', 'Branding for growing businesses', 'design.jpg', 'Build a consistent identity across your website, sales materials and campaigns.', 'Create a practical brand kit', 'Develop a clear positioning statement, visual direction and examples for the materials your team uses every week.', ['Brand positioning', 'Visual identity', 'Campaign templates']],
     ['content-writing', 'Content writing for websites and campaigns', 'design.jpg', 'Explain what you offer in the language your customers use.', 'Start with the questions customers ask', 'Use interviews and sales questions to outline service pages, campaign copy and follow-up messages.', ['Service pages', 'Landing page copy', 'Campaign messaging']],
     ['voice-sms', 'Voice SMS for reminders and updates', 'sms.jpg', 'Send recorded messages for announcements, appointment reminders and useful service updates.', 'Record a short, clear message', 'Keep the script to one purpose, choose the audience and schedule the call for a useful time.', ['Recorded announcements', 'Reminder calls', 'Campaign review']],
-    ['mobile-app-development', 'Mobile app development', 'web.jpg', 'Build apps around the tasks customers and teams need to complete on the move.', 'Map the core journey', 'Identify the main task, agree what data is needed and prototype the flow before development.', ['Journey mapping', 'Interface design', 'Responsive implementation']],
+    ['mobile-app-development', 'Mobile app development', 'web.jpg', 'Build apps around the tasks customers and teams need to complete on the move.', 'Agree what belongs in the first release', 'Define who will use the app, which tasks matter most and what devices and systems the first version must support.', ['User journeys and interface design', 'Device testing and release planning', 'Data and integration requirements']],
     ['graphic-design', 'Graphic design for campaigns', 'design.jpg', 'Create campaign visuals that stay consistent across social, landing pages and sales material.', 'Design a system for the campaign', 'Start with the core visual, then adapt it to the different formats the campaign needs.', ['Social creative', 'Ad formats', 'Brand collateral']],
     ['landing-page-design', 'Landing pages for campaigns', 'estate.jpg', 'Give each campaign a page focused on one offer and one next step.', 'Match the page to the ad', 'Clarify the offer above the fold, answer objections and make the enquiry or visit form easy to complete.', ['Offer and page copy', 'Mobile forms', 'Conversion measurement']],
   ]
   for (const [slug, title, image, intro, heading, text, points] of additional) {
     pages['services/' + slug] = { title, image, intro, label: 'Services', sections: [{ heading, text, points }] }
   }
+  pages['services/seo'].faq = [
+    ['Can SEO guarantee a first-page ranking?', 'No. Search positions can change and Google decides which pages to show. We prioritise issues we can address and report how visibility and enquiries change over time.'],
+    ['Will we need new website pages?', 'Sometimes. We first look for an existing page that can answer the relevant search. A new page makes sense when it covers a distinct service and provides useful information customers cannot find elsewhere on the site.'],
+  ]
   pages['services/bulk-sms'].sections.push({ heading: 'What to send', text: 'Use SMS for time-sensitive notices that can fit in a short message.', points: ['Appointment confirmations', 'Service notices', 'Offers for opted-in customers'] })
   pages['services/web-development'].sections.push({ heading: 'What the build includes', text: 'Map the navigation, build pages around the goal and prepare the site for updates after launch.', image: 'design.jpg', points: ['Responsive design', 'Content structure', 'Enquiry and booking forms'] })
   pages['services/seo-branding'].sections[0].links = [['Explore SEO', '/services/seo/'], ['Explore branding', '/services/branding/']]
+  pages['services/seo'].sections[0].links = [['Explore combined SEO and branding', '/services/seo-branding/']]
+  pages['services/branding'].sections[0].links = [['Explore combined SEO and branding', '/services/seo-branding/']]
 
   Object.assign(pages.about, {
     image: 'live-team.jpg', intro: 'Movictel is a Jaipur team working across SEO, paid campaigns, branding, web development and cloud communications.',
@@ -107,8 +113,8 @@ export function enrich(pages) {
   pages.portfolio.clients = true
   pages['portfolio/residential-campaign'].sections.push({ heading: 'What to measure', text: 'Track campaign sources, qualified enquiries and confirmed visits. Review each step to find where the buyer journey needs improvement.' })
   Object.assign(pages.contact, {
-    title: 'Let’s work together.',
-    intro: 'Digital marketing and business communications, from our Jaipur team.',
+    title: 'Let’s talk about your project.',
+    intro: 'Talk with our Jaipur team about your next campaign, website or customer communications workflow.',
     image: 'contact-workspace.webp',
     imageAlt: 'Camera, laptop and notebook on a creative workspace desk',
     form: true,

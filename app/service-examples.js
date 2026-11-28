@@ -4,8 +4,8 @@ export const serviceExamples = {
     [['Film a walkthrough', 'Open the content week with a short reel that shows what a buyer would see on a real visit.'], ['Explain the location', 'Use a carousel to give buyers the details they need to compare access, amenities and the surrounding area.'], ['Invite a visit', 'Share a story with a link to request a viewing and route responses to the right adviser.']],
   ],
   seo: [
-    ['Review whether search engines can index priority pages and whether business listings point to the right place.', 'Match the terms customers use to pages that explain the service and help them enquire.', 'Record current visibility and enquiry activity so later changes can be assessed against a baseline.'],
-    [['Find the missing searches', 'Compare brand searches with service and location searches to see where the business is hard to find.'], ['Improve the service page', 'Give the service its own useful page and link it from relevant pages and the local listing.'], ['Check the response', 'Review which queries lead people to the page and where enquiries are coming from.']],
+    ['Check whether Google can crawl and index priority pages, and review the accuracy of your Google Business Profile.', 'Match relevant searches to useful pages and identify missing information, unclear titles or weak internal links.', 'Record organic impressions and clicks in Search Console. Track enquiries separately in analytics or your lead records.'],
+    [['Find the visibility gap', 'Compare searches for the shop name with searches for block-printed fabrics, then check whether Google has indexed the relevant collection page.'], ['Improve the collection page', 'Show the available prints and fabrics, explain how to buy or visit, and link to the collection from the site’s main shop page. Keep the shop hours and address accurate on its Business Profile.'], ['Measure what changed', 'Compare the collection page’s Google Search impressions and clicks with its baseline. Use analytics or enquiry records to review what visitors do after landing on the page.']],
   ],
   'ppc-advertising': [
     ['Choose campaign formats and locations around the action you want customers to take.', 'Match the creative and landing page to the offer, then check that the enquiry source is recorded.', 'Review spend, lead sources and sales feedback together to guide the next changes.'],
@@ -68,9 +68,9 @@ export const workflowDetails = {
     'Look at the questions behind the messages and identify which formats deserve a follow-up or a different call to action.',
   ],
   seo: [
-    'Prioritize issues that block discovery of important pages before changing the copy or building new pages.',
-    'Check that page titles, headings, internal links and local listings point customers toward the same relevant information.',
-    'Review early movement in search visibility alongside customer enquiries and agree which pages to address next.',
+    'Inspect key URLs for crawl, index and canonical issues before deciding which fixes to tackle first.',
+    'Improve existing pages where they already answer the search. Create new pages where the business has a distinct service and useful information to share.',
+    'Compare equivalent reporting periods. Review seasonality, site changes and data gaps before treating any movement as an effect of the work.',
   ],
   'ppc-advertising': [
     'Decide which actions count as useful enquiries, which locations to include and how campaign spend will be reviewed.',
@@ -99,7 +99,7 @@ export const workflowDetails = {
   ],
   rcs: [
     'Prepare the image, sender identity and action destinations around the information the customer needs at that moment.',
-    'Open each link on a phone and check that the fallback includes enough context to use it independently.',
+    'Check which devices can receive RCS. Test the fallback on its own and configure it to avoid sending a duplicate reminder.',
     'Review which actions get tapped and confirm whether visitors can complete the intended booking or enquiry.',
   ],
   'bulk-sms': [

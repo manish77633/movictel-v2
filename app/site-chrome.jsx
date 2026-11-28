@@ -2,11 +2,9 @@
 import { useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { Header, Footer } from './home'
-import { useSmoothWheel } from './smooth-wheel'
 
-export function SiteChrome({ children }) {
-  useSmoothWheel()
-  return <><Header/>{children}<Footer/></>
+export function SiteChrome({ children, header, footer }) {
+  return <><Header config={header}/>{children}<Footer config={footer}/></>
 }
 
 export function Reveal({ children, className, style }) {
