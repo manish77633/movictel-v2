@@ -4,6 +4,8 @@ import { dirname, resolve } from 'node:path'
 import { pages } from './content'
 import { homeDefaults } from './page-metadata'
 import { redirectedPages } from './seo'
+import { chromeDefaults, completeChrome } from './chrome-content'
+import { enquiryServices, serviceMenu } from './service-menu'
 
 export function hasContentStorage() {
   return process.env.VERCEL !== '1' || Boolean(process.env.MOVICTEL_DB_PATH)
@@ -64,4 +66,39 @@ export function readSetting(key) {
   if (!hasContentStorage()) return null
   const row = db().prepare('SELECT document FROM settings WHERE key = ?').get(key)
   return row ? JSON.parse(row.document) : null
+}
+
+export function publishedCustomServices() {
+  if (!hasContentStorage()) return []
+  return db().prepare(`SELECT slug, published FROM pages
+    WHERE slug GLOB 'services/*' AND json_extract(published, '$.serviceCategory') IS NOT NULL
+    ORDER BY slug`).all().flatMap(({ slug, published }) => {
+    const page = JSON.parse(published)
+    if (!serviceMenu.some(group => group.id === page.serviceCategory)) return []
+    return [{ id: slug.slice('services/'.length), href: '/' + slug + '/', category: page.serviceCategory,
+      heading: page.title, text: page.intro, image: page.image, imageAlt: page.imageAlt || '' }]
+  })
+}
+
+export function publicEnquiryServices(services = publishedCustomServices()) {
+  return [...enquiryServices, ...services.map(service => [service.heading, service.id])]
+}
+
+export function readPublicHeader(services = publishedCustomServices()) {
+  const header = completeChrome('header', readSetting('header'))
+  const groups = header.serviceGroups.map(group => ({ ...group, links: [...group.links] }))
+  const existingLinks = new Set(groups.flatMap(group => group.links.map(link => link.href.replace(/\/$/, ''))))
+  for (const service of services) {
+    if (existingLinks.has(service.href.slice(0, -1))) continue
+    const defaults = chromeDefaults.header.serviceGroups[serviceMenu.findIndex(group => group.id === service.category)]
+    const defaultLinks = new Set(defaults.links.map(link => link.href.replace(/\/$/, '')))
+    let group = groups.find(item => item.heading === defaults.heading) ||
+      groups.find(item => item.links.some(link => defaultLinks.has(link.href.replace(/\/$/, ''))))
+    if (!group) {
+      group = { heading: defaults.heading, links: [] }
+      groups.push(group)
+    }
+    group.links.push({ label: service.heading, text: service.text, href: service.href })
+  }
+  return { ...header, serviceGroups: groups }
 }

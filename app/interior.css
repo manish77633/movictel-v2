@@ -619,6 +619,7 @@
 .service-directory-card { min-width: 0; overflow: hidden; border: 1px solid #d7deeb; background: #fff; transition: border-color .2s, translate .2s; }
 .service-directory-card:hover { translate: 0 -3px; border-color: #8298d0; }
 .service-directory-card > img { width: 100%; height: clamp(150px, 17vw, 225px); object-fit: cover; background: #dfe6f2; }
+.service-directory-card[data-cutout] > img { object-fit: contain; padding: 8px; background: transparent; }
 .service-directory-card > div { padding: 17px 18px 20px; }
 .service-directory-card > div > span { color: #3157d8; font-size: .78rem; }
 .service-directory-card h3 { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; font-size: clamp(1.15rem, 1.8vw, 1.55rem); font-weight: 560; line-height: 1.15; letter-spacing: -.03em; }

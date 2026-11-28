@@ -2,7 +2,7 @@ import { notFound, permanentRedirect } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
 import { SiteChrome, Reveal } from '../site-chrome'
-import { hasContentStorage, readPage, readSetting } from '../store'
+import { hasContentStorage, publicEnquiryServices, publishedCustomServices, readPage, readPublicHeader, readSetting } from '../store'
 import { ProjectEnquiry } from '../project-enquiry'
 import { ContactPage } from '../contact-page'
 import { hasAdminSession } from '../admin/auth'
@@ -10,7 +10,6 @@ import { AboutFilm, AboutGallery } from '../about-story'
 import { FounderFeature, SelectedWork } from '../selected-work'
 import { ClientLogoStrip } from '../client-logo-strip'
 import { JournalIndex, JournalArticle, JournalHighlights } from '../journal'
-import { enquiryServices } from '../service-menu'
 import { ServiceDetail } from '../service-detail'
 import { ServiceDirectory } from '../service-directory'
 import { redirectedPages } from '../seo'
@@ -46,8 +45,10 @@ export default async function Interior({ params, searchParams }) {
   const { slug } = await params
   const key = slug.join('/')
   const { preview, service, demo } = await searchParams
+  const services = publishedCustomServices()
+  const options = publicEnquiryServices(services)
   if (key === 'book-a-consultation') {
-    const selected = enquiryServices.some(([, id]) => id === service)
+    const selected = options.some(([, id]) => id === service)
     permanentRedirect('/contact/' + (selected ? '?service=' + encodeURIComponent(service) : '') + '#contact-enquiry')
   }
   if (Object.hasOwn(redirectedPages, key)) permanentRedirect(redirectedPages[key])
@@ -56,21 +57,28 @@ export default async function Interior({ params, searchParams }) {
   if (!page) notFound()
   const layout = pageLayout(key, page)
   const enquiryContent = layout.find(section => section.id === 'enquiry')?.content
-  const chrome = { header: readSetting('header'), footer: readSetting('footer') }
+  const chrome = { header: readPublicHeader(services), footer: readSetting('footer') }
   const additional = <ManagedSections sections={editablePageSections(key, page)}/>
   let body
 
   if (key === 'contact') {
-    body = <ContactPage page={page} layout={layout} service={service} demo={demo === 'ivr'} draft={draft}/>
+    body = <ContactPage page={page} layout={layout} service={service} options={options} demo={demo === 'ivr'} draft={draft}/>
   } else if (key === 'services') {
-    const cards = layout.flatMap(section => section.content.cards || [])
+    const directory = layout.map(section => {
+      if (!section.content.cards) return section
+      const cards = section.content.cards
+      const existing = new Set(cards.map(card => card.href.replace(/\/$/, '')))
+      const additions = services.filter(item => item.category === section.id && !existing.has(item.href.slice(0, -1)))
+      return { ...section, content: { ...section.content, cards: [...cards, ...additions] } }
+    })
+    const cards = directory.flatMap(section => section.content.cards || [])
     const published = Object.fromEntries(cards.filter(card => /^\/services\/[a-z0-9-]+\/$/.test(card.href))
       .map(card => [card.href, Boolean(readPage(card.href.slice(1, -1), draft))]))
-    body = <ServiceDirectory page={page} layout={layout} published={published}
-      enquiry={<ProjectEnquiry draft={draft} content={enquiryContent} viaWhatsApp={!hasContentStorage()}/>}/>
+    body = <ServiceDirectory page={page} layout={directory} published={published}
+      enquiry={<ProjectEnquiry options={options} draft={draft} content={enquiryContent} viaWhatsApp={!hasContentStorage()}/>}/>
   } else if (key.startsWith('services/') && layout.length) {
     body = <ServiceDetail page={page} layout={layout} draft={draft}
-      enquiry={<ProjectEnquiry service={slug[1]} content={enquiryContent} draft={draft} viaWhatsApp={!hasContentStorage()}/>}/>
+      enquiry={<ProjectEnquiry service={slug[1]} options={options} content={enquiryContent} draft={draft} viaWhatsApp={!hasContentStorage()}/>}/>
   } else if (key === 'blog') {
     body = <JournalIndex page={{ ...page, articles: getArticles(draft) }} layout={layout} additional={additional}/>
   } else if (key.startsWith('blog/')) {

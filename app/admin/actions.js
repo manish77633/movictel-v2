@@ -12,6 +12,7 @@ import { pagePath } from '../seo'
 import { revalidatePath } from 'next/cache'
 import { readSeo, safeUrl } from './seo-fields'
 import { cookieName, hasAdminSession, matches, sign } from './auth'
+import { enquiryServices, serviceMenu } from '../service-menu'
 
 export async function login(form) {
   if (!hasContentStorage()) redirect('/admin/')
@@ -194,6 +195,10 @@ function mediaType(bytes) {
 function refreshPublic(slug) {
   revalidatePath(pagePath(slug))
   revalidatePath('/sitemap.xml')
+  if (slug.startsWith('services/')) {
+    revalidatePath('/')
+    revalidatePath('/[...slug]', 'page')
+  }
 }
 
 export async function saveSeo(_previous, form) {
@@ -242,6 +247,26 @@ function withSeo(page, seo) {
   return updated
 }
 
+export async function createService(form) {
+  if (!hasContentStorage() || !await hasAdminSession()) redirect('/admin/')
+  const title = String(form.get('title') || '').trim()
+  const id = String(form.get('slug') || '').trim().toLowerCase()
+  const category = serviceMenu.find(group => group.id === form.get('category'))
+  const slug = 'services/' + id
+  if (!title || title.length > 150 || !category || id.length > 90 || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id) ||
+      basePage(slug) || enquiryServices.some(([, value]) => value === id)) {
+    redirect('/admin/?view=services&error=service')
+  }
+  const page = {
+    title, serviceName: title, serviceCategory: category.id, label: category.title,
+    intro: 'Explore how Movictel can help with ' + title + '.',
+    image: 'live-team.jpg', imageAlt: '', sections: [],
+  }
+  const result = db().prepare("INSERT OR IGNORE INTO pages(slug,draft,published) VALUES (?,?,'null')").run(slug, JSON.stringify(page))
+  if (!result.changes) redirect('/admin/?view=services&error=service')
+  redirect('/admin/?page=' + encodeURIComponent(slug) + '&status=draft')
+}
+
 export async function createPage(form) {
   if (!hasContentStorage() || !await hasAdminSession()) redirect('/admin/')
   const slug = String(form.get('slug') || '').trim().toLowerCase()
@@ -274,7 +299,7 @@ export async function changePageStatus(form) {
       throw error
     }
     refreshPublic(slug)
-    redirect('/admin/?view=pages&status=deleted')
+    redirect('/admin/?view=' + (slug.startsWith('services/') ? 'services' : 'pages') + '&status=deleted')
   }
   if (intent !== 'unpublish') redirect('/admin/?page=' + encodeURIComponent(slug))
   db().prepare("INSERT INTO pages(slug,draft,published) VALUES (?,?,'null') ON CONFLICT(slug) DO UPDATE SET draft=excluded.draft,published='null'").run(slug, draft)

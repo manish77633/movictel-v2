@@ -12,7 +12,7 @@ import { SectionFrame, SectionMedia } from './section-frame'
 import { ClientLogoStrip } from './client-logo-strip'
 import { AnimatePresence, motion, MotionConfig, useInView, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import {
-  ArrowDown, ArrowDownRight, ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, Building2, ChevronDown, Cloud, CodeXml, FilePenLine, LayoutTemplate, Megaphone, Monitor, MousePointerClick, Palette, Pause, Play, Smartphone,
+  ArrowDown, ArrowDownRight, ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, Building2, ChevronDown, Cloud, CodeXml, FilePenLine, LayoutTemplate, Megaphone, Monitor, MousePointerClick, Palette, Smartphone,
   Lightbulb, MapPin, Menu, Search, MessageCircle, MessagesSquare, Minus, Phone, Plus, Radio, TrendingUp, UserRound, X,
 } from 'lucide-react'
 import { StrategyIcon } from './strategy-icon.jsx'
@@ -152,42 +152,34 @@ function ContentButton({ button, className = 'button', icon: Icon = ArrowUpRight
 
 function Hero({ page, content, defaultTitle }) {
   const video = isVideo(content.media, content.media === page.image ? page.mediaType : '')
-  const poster = video ? media(content.poster) : undefined
+  const playlist = [
+    ...(video ? [{ video: content.media, poster: content.poster }] : []),
+    ...content.additionalVideos.filter(clip => isVideo(clip.video)),
+  ]
   const headlines = content.rotatingHeadlines
   const reduceMotion = useReducedMotion()
   const [service, setService] = useState(0)
+  const [clipIndex, setClipIndex] = useState(0)
   const videoRef = useRef(null)
-  const [playing, setPlaying] = useState(false)
-
-  async function toggleVideo() {
-    const video = videoRef.current
-    if (video.paused) {
-      try { await video.play() } catch { setPlaying(false) }
-    } else {
-      video.pause()
-    }
-  }
+  const activeClip = playlist[clipIndex % playlist.length]
+  const background = media(video ? content.poster : content.media) || media(playlist[0]?.poster)
 
   useEffect(() => {
-    const video = videoRef.current
     const timer = reduceMotion || !headlines.length ? null : window.setInterval(() => setService(index => (index + 1) % headlines.length), 2500)
-    if (video && reduceMotion) {
-      video.pause()
-    } else {
-      video?.play().catch(() => {})
-    }
     return () => window.clearInterval(timer)
-  }, [reduceMotion, content.media, headlines.length])
+  }, [reduceMotion, headlines.length])
+
+  useEffect(() => {
+    const player = videoRef.current
+    if (reduceMotion) player?.pause()
+    else player?.play().catch(() => {})
+  }, [reduceMotion, activeClip?.video, clipIndex])
 
   return <section className="hero home-hero" id="home-hero" aria-labelledby="hero-title">
-    {(poster || (!video && content.media)) && <img className="hero-image" src={poster || media(content.media)} alt={content.imageAlt} fetchPriority="high"/>}
-    {video && <video ref={videoRef} className="hero-image hero-video" src={media(content.media)}
-      poster={poster} loop muted playsInline aria-hidden="true"
-      onPlaying={() => setPlaying(true)} onPause={() => setPlaying(false)}/>}
-    {video && <button className="hero-video-toggle" type="button" onClick={toggleVideo}
-      aria-label={playing ? 'Pause background video' : 'Play background video'}>
-      {playing ? <Pause size={17}/> : <Play size={17}/>}
-    </button>}
+    {background && <img className="hero-image" src={background} alt={content.imageAlt} fetchPriority="high"/>}
+    {activeClip && <video key={clipIndex} ref={videoRef} className="hero-image hero-video" src={media(activeClip.video)}
+      poster={media(activeClip.poster) || background} loop={playlist.length === 1} muted playsInline aria-hidden="true"
+      onEnded={() => setClipIndex(index => (index + 1) % playlist.length)}/>}
     <div className="wrap hero-layout">
       <div className="hero-copy">
         <p className="hero-channels">{content.label}</p>
@@ -311,7 +303,9 @@ function Services({ content }) {
   return <section className="section service-section" id="services" aria-labelledby="services-heading">
     <div className="wrap">
       <div className="section-heading"><RevealHeading id="services-heading">{content.heading}</RevealHeading><p>{content.text}</p></div>
-      {Object.entries(content.groups).map(([id, group]) => {
+      {['promote', 'marketing', 'development'].map(id => {
+        const group = content.groups[id]
+        const cards = id === 'promote' && content.featuredIvr.visible ? [content.featuredIvr, ...group.cards] : group.cards
         const Icon = { marketing: TrendingUp, promote: MessageCircle, development: CodeXml }[id]
         return <section key={id} id={id} className="service-group" aria-labelledby={id + '-heading'}>
         <div className="service-group-heading">
@@ -320,9 +314,9 @@ function Services({ content }) {
             <span className="category-icon" aria-hidden="true"><Icon size={17}/></span>
           </div>
           <p>{group.text}</p>
-          <ServiceIndex groupId={id} items={group.cards.map(card => [card.heading])}/>
+          <ServiceIndex groupId={id} items={cards.map(card => [card.heading])}/>
         </div>
-        <ul className="service-grid">{group.cards.map(({ heading, text, image, imageAlt, deliverables, button }, index) => {
+        <ul className="service-grid">{cards.map(({ heading, text, image, imageAlt, deliverables, button }, index) => {
           const CardLink = button.href ? Link : 'div'
           return <li className="service-card" id={id + '-service-' + index} tabIndex={-1} key={index} style={{ "--stack-index": index }}>
 
@@ -556,8 +550,9 @@ export function Footer({ config, omitClosing = false } = {}) {
 
 function ExploreMovictel({ content }) {
   const section = useRef(null)
+  const stage = useRef(null)
   const video = useRef(null)
-  const visible = useInView(section, { amount: .55 })
+  const visible = useInView(stage)
   const reducedMotion = useReducedMotion()
   const [revealing, setRevealing] = useState(false)
   const { scrollYProgress } = useScroll({ target: section, offset: ['start start', 'end end'] })
@@ -577,7 +572,7 @@ function ExploreMovictel({ content }) {
   }, [visible, revealing, reducedMotion, content.media])
 
   return <section className="home-explore" ref={section} aria-labelledby="home-explore-title">
-    <div className="home-explore-stage">
+    <div className="home-explore-stage" ref={stage}>
       <motion.h2 id="home-explore-title" style={{ scale, opacity: headingOpacity }}>{content.heading}</motion.h2>
       <motion.div className="home-explore-picture" style={{ visibility: videoVisibility, opacity: videoOpacity, clipPath: crop }}>
         {isVideo(content.media) ? <video ref={video} muted loop playsInline preload="metadata"

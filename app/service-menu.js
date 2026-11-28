@@ -1,7 +1,7 @@
 export const serviceMenu = [
   { id: 'promote', title: 'Cloud communications', items: [
-    ['WhatsApp Business API', 'whatsapp-business-api', 'Automated replies and team handoff'],
     ['IVR', 'ivr', 'Call menus and routing'],
+    ['WhatsApp Business API', 'whatsapp-business-api', 'Automated replies and team handoff'],
     ['RCS messaging', 'rcs', 'Branded messages with actions'],
     ['Bulk SMS', 'bulk-sms', 'Alerts and reminders'],
     ['Voice SMS', 'voice-sms', 'Recorded calls and updates'],

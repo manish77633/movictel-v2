@@ -1,6 +1,11 @@
+export const serviceCutouts = {
+  ivr: 'service-ivr-cutout.webp',
+  'social-media-marketing-jaipur': 'service-social-cutout.webp',
+}
+
 const services = [
   { id: 'marketing', label: 'Digital marketing', description: 'Get discovered and give people a reason to enquire.', items: [
-    ['Social media marketing', 'Put your offer in front of the right audience.', 'service-social.webp'],
+    ['Social media marketing', 'Put your offer in front of the right audience.', serviceCutouts['social-media-marketing-jaipur']],
     ['Branding services', 'Build a recognizable identity across channels.', 'service-branding.webp'],
     ['Website & local SEO', 'Help customers find you in search and on maps.', 'service-seo.webp'],
     ['Content writing', 'Explain what you offer in clear, useful copy.', 'service-writing.webp'],
@@ -46,7 +51,7 @@ const strategySteps = [
 ]
 
 const serviceHighlights = {
-  'service-social.webp': ['Content calendars', 'Reels and paid campaigns'],
+  [serviceCutouts['social-media-marketing-jaipur']]: ['Content calendars', 'Reels and paid campaigns'],
   'service-branding.webp': ['Brand positioning', 'Identity and templates'],
   'service-seo.webp': ['Local listings', 'Search and website audit'],
   'service-writing.webp': ['Website copy', 'Campaign messaging'],
@@ -112,6 +117,7 @@ export const enquiryContent = {
 }
 
 const servicePages = {
+  [serviceCutouts['social-media-marketing-jaipur']]: 'social-media-marketing-jaipur',
   'service-social.webp': 'social-media-marketing-jaipur',
   'service-branding.webp': 'branding',
   'service-seo.webp': 'seo',
@@ -146,13 +152,18 @@ export function updateLegacyHomeNavigation(id, content) {
         : card
     }),
   }]))
-  return { ...content, groups }
+  groups.marketing.cards = groups.marketing.cards.map(card => card.image === 'service-social.webp'
+    ? { ...card, image: serviceCutouts['social-media-marketing-jaipur'] } : card)
+  const featuredIvr = content.featuredIvr.image === 'service-ivr-feature.webp'
+    ? { ...content.featuredIvr, image: serviceCutouts.ivr } : content.featuredIvr
+  return { ...content, groups, featuredIvr }
 }
 
 export const homeContent = {
   hero: {
     rotateHeadlines: true, rotatingPrefix: 'Leading', rotatingSuffix: 'Company in India',
     rotatingHeadlines: heroServices, poster: 'estate-hero.jpg', buttonPosition: 'start',
+    additionalVideos: [{ video: 'client-demo-property.mp4?v=2', poster: 'client-demo-property.jpg?v=2' }],
     primaryButton: button('Book a consultation', '#enquiry'),
     secondaryButton: button('Explore services', '#services'),
     quickLinks: services.map(({ id, label }) => button(label, '#' + id)),
@@ -161,6 +172,12 @@ export const homeContent = {
     heading: 'Find the right service.',
     text: 'Choose a specific service or bring marketing, messaging and development together.',
     directoryButton: button('Browse Movictelâ€™s service pages', '/services/'),
+    featuredIvr: {
+      visible: true, heading: 'IVR', text: 'Give callers a professional greeting and route them to the right team.',
+      image: serviceCutouts.ivr, imageAlt: 'Customer support specialist handling a call',
+      deliverables: ['Custom greetings and voice menus', 'Call routing and after-hours options'],
+      button: button('Explore IVR service', '/services/ivr/'),
+    },
     groups: Object.fromEntries(services.map(({ id, label, description, items }) => [id, {
       heading: label, text: description,
       cards: items.map(([name, text, image]) => ({

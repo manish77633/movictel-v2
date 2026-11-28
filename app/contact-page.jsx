@@ -6,7 +6,7 @@ import { ManagedSections } from './managed-sections'
 import { ContactProcess } from './contact-process'
 import { ProjectEnquiry } from './project-enquiry'
 
-export function ContactPage({ page, layout, service, demo, draft }) {
+export function ContactPage({ page, layout, service, options, demo, draft }) {
   const officeVisible = layout.find(section => section.id === 'office')?.visible
   const render = {
     hero: content => <section className="contact-hero" aria-labelledby="contact-title">
@@ -19,7 +19,7 @@ export function ContactPage({ page, layout, service, demo, draft }) {
         </div>
       </div>
     </section>,
-    enquiry: content => <div className="contact-paper"><ProjectEnquiry contact service={service} demo={demo} draft={draft} content={content} viaWhatsApp={!hasContentStorage()}/></div>,
+    enquiry: content => <div className="contact-paper"><ProjectEnquiry contact service={service} options={options} demo={demo} draft={draft} content={content} viaWhatsApp={!hasContentStorage()}/></div>,
     process: content => <div className="contact-paper"><ContactProcess content={content}/></div>,
     office: content => <div className="contact-paper"><Office content={content}/></div>,
     careers: content => <div className="contact-paper"><section className="wrap contact-careers" aria-labelledby="contact-careers-heading">

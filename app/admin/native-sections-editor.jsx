@@ -119,7 +119,7 @@ function Field({ name, seed, value, update, selectAsset }) {
     case 'checkbox':
       return <label className="admin-checkbox"><input type="checkbox" checked={value} onChange={event => update(event.target.checked)}/>{label}</label>
     case 'media':
-      return <MediaPicker label={label} value={value} onChange={update} onSelect={selectAsset} imageOnly={name === 'poster'}/>
+      return <MediaPicker label={label} value={value} onChange={update} onSelect={selectAsset} imageOnly={name === 'poster'} videoOnly={name === 'video'}/>
     case 'link':
       return <LinkField label={label} value={value} onChange={update}/>
     case 'position':

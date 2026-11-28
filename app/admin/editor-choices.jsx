@@ -46,7 +46,7 @@ export function LinkField({ label, value, onChange, required }) {
   </div>
 }
 
-export function MediaPicker({ label, value, onChange, imageOnly = false, onSelect }) {
+export function MediaPicker({ label, value, onChange, imageOnly = false, videoOnly = false, onSelect }) {
   const { library, indexed, addAsset } = useContext(EditorChoices)
   const dialog = useRef(null)
   const [query, setQuery] = useState('')
@@ -60,9 +60,9 @@ export function MediaPicker({ label, value, onChange, imageOnly = false, onSelec
   const matches = useMemo(() => {
     if (!opened) return []
     const search = query.trim().toLowerCase()
-    return library.filter(item => ((!imageOnly && type === 'all') || item.video === (!imageOnly && type === 'videos')) &&
-      item.search.includes(search))
-  }, [imageOnly, library, opened, query, type])
+    const selectedType = imageOnly ? 'images' : videoOnly ? 'videos' : type
+    return library.filter(item => (selectedType === 'all' || item.video === (selectedType === 'videos')) && item.search.includes(search))
+  }, [imageOnly, videoOnly, library, opened, query, type])
   const pageCount = Math.max(1, Math.ceil(matches.length / pageSize))
   const currentPage = Math.min(pageIndex, pageCount - 1)
   const firstItem = currentPage * pageSize
@@ -70,6 +70,10 @@ export function MediaPicker({ label, value, onChange, imageOnly = false, onSelec
 
   async function upload(file) {
     if (!file) return
+    if (videoOnly && !/\.(mp4|webm)$/i.test(file.name)) {
+      setError('Choose an MP4 or WebM video.')
+      return
+    }
     const form = new FormData()
     form.append('file', file)
     if (imageOnly) form.set('imageOnly', '1')
@@ -111,13 +115,13 @@ export function MediaPicker({ label, value, onChange, imageOnly = false, onSelec
       <div className="studio-media-tools">
         <label><Search size={16}/>Search files<input type="search" value={query} onChange={event => { setPageIndex(0); setQuery(event.target.value) }}/></label>
         <label><Upload size={16}/>Upload a file<input type="file" disabled={pending}
-          accept={imageOnly ? 'image/jpeg,image/png,image/webp' : 'image/jpeg,image/png,image/webp,video/mp4,video/webm'}
+          accept={imageOnly ? 'image/jpeg,image/png,image/webp' : videoOnly ? 'video/mp4,video/webm' : 'image/jpeg,image/png,image/webp,video/mp4,video/webm'}
           onChange={event => { upload(event.target.files?.[0]); event.target.value = '' }}/></label>
       </div>
       {pending && <p role="status">Uploading…</p>}
       {error && <p role="alert">{error}</p>}
       <div className="studio-media-pagination">
-        {!imageOnly && <label>Media type<select value={type} onChange={event => { setPageIndex(0); setType(event.target.value) }}>
+        {!imageOnly && !videoOnly && <label>Media type<select value={type} onChange={event => { setPageIndex(0); setType(event.target.value) }}>
           <option value="all">Images and videos</option><option value="images">Images</option><option value="videos">Videos</option>
         </select></label>}
         <p role="status">{matches.length

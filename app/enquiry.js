@@ -1,6 +1,5 @@
 'use server'
-import { db, hasContentStorage } from './store'
-import { enquiryServices } from './service-menu'
+import { db, hasContentStorage, publicEnquiryServices } from './store'
 import nodemailer from 'nodemailer'
 
 async function notifyEnquiry({ name, email, phone, service, details, demo }) {
@@ -34,7 +33,7 @@ export async function submitProjectEnquiry(_previous, form) {
   const name = String(form.get('name') ?? '').trim()
   const email = String(form.get('email') ?? '').trim()
   const phone = String(form.get('phone') ?? '').trim()
-  const service = enquiryServices.find(([, id]) => id === form.get('service'))?.[0]
+  const service = publicEnquiryServices().find(([, id]) => id === form.get('service'))?.[0]
   const message = String(form.get('message') ?? '').trim()
   const phoneDigits = phone.replace(/\D/g, '').length
   if (!name || name.length > 120 || !/^[^\s@<>,;:"\\]+@[^\s@<>,;:"\\]+\.[^\s@<>,;:"\\]+$/.test(email) || email.length > 254 ||

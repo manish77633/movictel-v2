@@ -1,5 +1,6 @@
 import { sectionAction } from '../section-layout'
 import { safeUrl } from './seo-fields'
+import { isVideo } from '../media-source'
 
 const filePath = /^(?:[\w.-]+\/)*[\w.-]+\.(?:jpg|jpeg|png|webp|mp4|webm|avif|gif|svg)(?:\?v=\d+)?$/i
 const assetPath = /^\/api\/media\/[a-f0-9-]{36}(?:#video)?$/
@@ -19,7 +20,7 @@ export function fieldType(key, value) {
   if (Array.isArray(value)) return 'list'
   if (typeof value === 'object') return 'group'
   if (typeof value === 'boolean') return 'checkbox'
-  if (['image', 'media', 'poster', 'backdrop'].includes(key)) return 'media'
+  if (['image', 'media', 'video', 'poster', 'backdrop'].includes(key)) return 'media'
   if (key === 'href' || key.endsWith('Href')) return 'link'
   if (key === 'buttonPosition') return 'position'
   if (['text', 'answer', 'description', 'quote', 'intro', 'formText', 'demoText'].includes(key)) return 'textarea'
@@ -44,7 +45,7 @@ function validatedValue(model, value, key) {
       if (typeof value !== 'boolean') throw new Error('Invalid toggle')
       return value
     case 'media':
-      if (!validMedia(value)) throw new Error('Invalid media')
+      if (!validMedia(value) || (key === 'video' && value && !isVideo(value))) throw new Error('Invalid media')
       return value
     case 'link':
       if (typeof value !== 'string' || value.length > 1500 || (value && !safeUrl(value) && !/^#[a-z0-9-]+$/i.test(value))) throw new Error('Invalid link')

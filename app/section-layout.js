@@ -1,4 +1,4 @@
-import { enquiryContent, homeContent, updateLegacyHomeNavigation } from './home-content'
+import { enquiryContent, homeContent, serviceCutouts, updateLegacyHomeNavigation } from './home-content'
 import { aboutChapters, campaignSteps, contactSteps, launchInputs, propertyChapters, propertyTopics, work } from './template-seeds'
 import { serviceBasics } from './service-basics'
 import { serviceGuides } from './service-guides'
@@ -50,7 +50,7 @@ export function pageSectionCatalog(slug, page) {
       label: title,
       heading: { marketing: 'Get discovered and build demand.', promote: 'Keep conversations moving.', development: 'Make the next step easier.' }[id],
       cards: items.map(([heading, service, text]) => ({
-        heading, text, image: servicePhotos[service]?.hero || 'live-team.jpg', imageAlt: '',
+        heading, text, image: serviceCutouts[service] || servicePhotos[service]?.hero || 'live-team.jpg', imageAlt: '',
         href: '/services/' + service + '/',
       })),
     })),
@@ -58,6 +58,7 @@ export function pageSectionCatalog(slug, page) {
   ]
 
   if (slug.startsWith('services/')) {
+    if (page.serviceCategory) return customServiceCatalog(page)
     const id = slug.slice('services/'.length)
     const basics = serviceBasics[id]
     const guide = serviceGuides[id]
@@ -147,6 +148,47 @@ export function pageSectionCatalog(slug, page) {
   return []
 }
 
+function customServiceCatalog(page) {
+  const name = page.serviceName || page.title
+  const image = page.image || 'live-team.jpg'
+  const stages = [
+    ['Discovery', 'We review your goals, audience and current setup.'],
+    ['Setup', 'We agree on the scope and prepare the work for review.'],
+    ['Launch and review', 'We launch the approved work and discuss what to improve next.'],
+  ]
+  return [
+    item('hero', 'Service hero', heroContent(page, {
+      primaryButton: button('Book a consultation', '#enquiry'),
+      secondaryButton: button('Explore the service', '#property-strategy'), buttonPosition: 'start',
+    })),
+    item('overview', 'Service overview', {
+      heading: 'What you get with ' + name, text: 'A plan based on your goals and a clear scope of work.',
+      topics: mediaCards(stages.map(([title, text]) => ({ title, text, image }))),
+    }),
+    item('example', 'Service example', {
+      heading: 'An example project', label: 'Illustrative example',
+      text: 'Here is how a typical project could progress from the first conversation to launch.',
+      steps: mediaCards(stages.map(([heading, text], index) => ({ heading, text, image, channel: 'Step ' + (index + 1) }))),
+    }),
+    item('faq', 'Frequently asked questions', {
+      heading: 'Frequently asked questions',
+      questions: [
+        { question: 'What do I need to get started?', answer: 'Share your goals, current setup and any deadlines during the consultation.' },
+        { question: 'How long will the project take?', answer: 'We agree on a timeline after reviewing the scope and what is already in place.' },
+      ],
+    }),
+    item('workflow', 'Delivery workflow', {
+      heading: 'How we deliver ' + name,
+      stages: mediaCards(stages.map(([title, result]) => ({ title, result, name, image, intro: '' }))),
+    }),
+    item('brief', 'Project brief', {
+      heading: 'Plan your project', text: 'Tell us what you want to achieve and when you need to get started.',
+      button: button('Discuss your project', '#enquiry'), buttonPosition: 'start', points: launchInputs,
+    }),
+    item('enquiry', 'Enquiry form', enquiryContent),
+  ]
+}
+
 function serviceCatalog(id, page, basics, guide) {
   const property = id === 'real-estate-marketing'
   const [name, definition, useCase, deliverables] = basics || []
@@ -202,6 +244,17 @@ export function pageLayout(slug, page) {
   const mapped = new Map(definitions.map(({ id, name, content, visible }) => {
     const entry = saved.get(id)
     const resolved = fillDefaults(content, entry?.content)
+    if (slug === 'services' && resolved.cards) {
+      resolved.cards = resolved.cards.map(card => {
+        if (card.href === '/services/ivr/' && ['service-ivr-feature.webp', servicePhotos.ivr.hero].includes(card.image)) {
+          return { ...card, image: serviceCutouts.ivr }
+        }
+        if (card.href === '/services/social-media-marketing-jaipur/' && card.image === servicePhotos['social-media-marketing-jaipur'].hero) {
+          return { ...card, image: serviceCutouts['social-media-marketing-jaipur'] }
+        }
+        return card
+      })
+    }
     return [id, {
       id, name, visible: entry?.visible ?? visible ?? true, background: entry?.background || '', backdrop: entry?.backdrop || '',
       action: fillDefaults(sectionAction, entry?.action),

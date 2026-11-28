@@ -16,6 +16,8 @@ import { SeoEditor } from './seo-editor'
 import { ChromeEditor } from './chrome-editor'
 import { StudioLink } from './studio-navigation'
 import { Submit } from './submit'
+import { CreateService } from './create-service'
+import { PasswordField } from './password-field'
 import './studio.css'
 
 export const dynamic = 'force-dynamic'
@@ -51,6 +53,7 @@ const editorUrl = (slug, seo = false) => '/admin/?' + (seo ? 'view=seo&' : '') +
 
 const statuses = { published: 'Changes published.', draft: 'Draft saved.', saved: 'Changes saved.', unpublished: 'Page unpublished.', deleted: 'Page deleted.' }
 const errors = { upload: 'Choose a supported image or video up to 20 MB.', slug: 'Choose a unique URL slug with letters, numbers and hyphens.',
+  service: 'Choose a service name, category and a unique URL slug with letters, numbers and hyphens.',
   seo: 'Check the metadata fields. Canonical and social image URLs must use HTTPS or a site-relative path.', 'in-use': 'This asset is still used by a page, header or footer.' }
 
 export default async function Admin({ searchParams }) {
@@ -65,7 +68,7 @@ export default async function Admin({ searchParams }) {
       <img src="/media/logo-color.png" alt="Movictel"/>
       <h1>Content Studio</h1>
       {query.login && <p role="alert">Sign in failed. Check your password and server configuration.</p>}
-      <label>Admin password<input name="password" type="password" autoComplete="current-password" required/></label>
+      <PasswordField/>
       <Submit className="button">Sign in</Submit>
     </form>
   </main>
@@ -157,6 +160,7 @@ export default async function Admin({ searchParams }) {
             <div className="admin-controls"><Submit className="button">Save settings</Submit><Link href="/sitemap.xml">View sitemap</Link></div>
           </form>
           : <>
+            {id === 'services' && <CreateService/>}
             {id === 'pages' && <details className="studio-panel studio-create"><summary>New page</summary>
               <form className="interior-form" action={createPage}><div className="admin-fields">
                 <label>Page name<input name="title" required maxLength={150}/></label>

@@ -2,6 +2,9 @@ import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
 import { LayoutSections, SectionButton, SectionMedia } from './section-frame'
 import { ManagedSections } from './managed-sections'
+import { serviceCutouts } from './home-content'
+
+const cutoutImages = new Set(Object.values(serviceCutouts))
 
 export function ServiceDirectory({ page, layout, enquiry, published }) {
   const groups = layout.filter(section => section.content.cards && section.visible)
@@ -26,8 +29,8 @@ export function ServiceDirectory({ page, layout, enquiry, published }) {
         const image = card.image
         const copy = <><SectionMedia value={image} alt={card.imageAlt}/><div><span>0{index + 1}</span><h3>{card.heading}{link && <ArrowUpRight size={18}/>}</h3><p>{card.text}</p></div></>
         return link
-          ? <Link className="service-directory-card" href={card.href} key={index}>{copy}</Link>
-          : <article className="service-directory-card" key={index}>{copy}</article>
+          ? <Link className="service-directory-card" data-cutout={cutoutImages.has(image) || undefined} href={card.href} key={index}>{copy}</Link>
+          : <article className="service-directory-card" data-cutout={cutoutImages.has(image) || undefined} key={index}>{copy}</article>
       })}</div>
     </section></div>
   }

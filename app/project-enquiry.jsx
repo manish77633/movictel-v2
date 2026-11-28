@@ -7,7 +7,7 @@ import { enquiryServices } from './service-menu'
 import { enquiryContent } from './home-content'
 import { SignalWaves } from './signal-waves'
 
-export function ProjectEnquiry({ service = '', viaWhatsApp, contact = false, demo = false, draft = false, content = enquiryContent }) {
+export function ProjectEnquiry({ service = '', options = enquiryServices, viaWhatsApp, contact = false, demo = false, draft = false, content = enquiryContent }) {
   const [result, submit, pending] = useActionState(submitProjectEnquiry, null)
   const dragStart = useRef(null)
   const suppressClick = useRef(false)
@@ -54,9 +54,9 @@ export function ProjectEnquiry({ service = '', viaWhatsApp, contact = false, dem
         <label>{content.emailLabel}<input name="email" type="email" autoComplete="email" maxLength={254} required/></label>
         <label>{content.phoneLabel}<input name="phone" type="tel" autoComplete="tel" maxLength={30} required/></label>
         {demo ? <label>{content.serviceLabel}<input value="IVR" readOnly/><input name="service" type="hidden" value="ivr"/></label> : <label>{content.serviceLabel}
-          <select name="service" defaultValue={enquiryServices.some(([, id]) => id === service) ? service : ''} required>
+          <select name="service" defaultValue={options.some(([, id]) => id === service) ? service : ''} required>
             <option value="" disabled>{content.servicePlaceholder}</option>
-            {enquiryServices.map(([label, id]) => <option value={id} key={id}>{label}</option>)}
+            {options.map(([label, id]) => <option value={id} key={id}>{label}</option>)}
           </select>
         </label>}
         {demo && <>

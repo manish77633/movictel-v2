@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import { buildMetadata, homeDefaults } from './page-metadata'
 import Home from './home'
 import { ProjectEnquiry } from './project-enquiry'
-import { hasContentStorage, readPage, readSetting } from './store'
+import { hasContentStorage, publicEnquiryServices, publishedCustomServices, readPage, readPublicHeader, readSetting } from './store'
 import { hasAdminSession } from './admin/auth'
 import { pageLayout } from './section-layout'
 import { ManagedSections } from './managed-sections'
@@ -22,6 +22,8 @@ export default async function Page({ searchParams }) {
   const page = readPage('', draft)
   if (!page) notFound()
   const layout = pageLayout('', page)
-  return <Home layout={layout} page={page} defaultTitle={homeDefaults.title} header={readSetting('header')} footer={readSetting('footer')}
-    sections={<ManagedSections sections={page.sections}/>} enquiry={<ProjectEnquiry content={layout.find(section => section.id === 'enquiry').content} draft={draft} viaWhatsApp={!hasContentStorage()}/>}/>
+  const services = publishedCustomServices()
+  return <Home layout={layout} page={page} defaultTitle={homeDefaults.title} header={readPublicHeader(services)} footer={readSetting('footer')}
+    sections={<ManagedSections sections={page.sections}/>} enquiry={<ProjectEnquiry options={publicEnquiryServices(services)}
+      content={layout.find(section => section.id === 'enquiry').content} draft={draft} viaWhatsApp={!hasContentStorage()}/>}/>
 }
